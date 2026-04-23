@@ -307,7 +307,7 @@ pluxx dev --target claude-code
 
 ## Built with
 
-- [Pluxx](https://github.com/orchid-labs/pluxx) — cross-platform plugin SDK (autopilot, build, install)
+- [Pluxx](https://github.com/orchidautomation/pluxx) — cross-platform plugin SDK (autopilot, build, install)
 - [PlayKit MCP](https://mcp.playkit.sh/mcp) — 24-tool knowledge + Clay API surface
 - Author: **Orchid Labs**
 - License: MIT
