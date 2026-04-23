@@ -1,0 +1,1191 @@
+{
+  "version": 1,
+  "source": {
+    "transport": "http",
+    "url": "https://mcp.playkit.sh/mcp",
+    "auth": {
+      "type": "header",
+      "envVar": "PLAYKIT_API_KEY",
+      "headerName": "X-API-Key",
+      "headerTemplate": "${value}"
+    }
+  },
+  "serverInfo": {
+    "name": "clay-knowledge",
+    "version": "1.27.0"
+  },
+  "settings": {
+    "pluginName": "playkit",
+    "displayName": "PlayKit",
+    "description": "PlayKit plugin scaffold for setup and auth and workflow design workflows.",
+    "skillGrouping": "workflow",
+    "requestedHookMode": "safe",
+    "generatedHookMode": "safe",
+    "generatedHookEvents": [
+      "sessionStart"
+    ],
+    "runtimeAuthMode": "inline"
+  },
+  "userConfig": [
+    {
+      "key": "playkit-api-key",
+      "title": "Playkit Api Key",
+      "description": "Authentication credential for the clay-knowledge MCP server.",
+      "type": "secret",
+      "required": true,
+      "envVar": "PLAYKIT_API_KEY",
+      "targets": [
+        "claude-code",
+        "opencode",
+        "codex",
+        "cursor"
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "name": "get_pricing",
+      "description": "Get PlayKit pricing tiers, per-tool costs, and checkout URLs.\n\n        Returns machine-readable pricing for all tiers including:\n        - Tier names, prices, and query limits\n        - Per-tool credit costs\n        - Checkout URLs for each tier\n        - Current auth method (license key via X-API-Key header)\n\n        This tool does not require authentication. Use it to discover\n        PlayKit pricing before subscribing.\n\n        Returns:\n            JSON with service info, tiers array, and checkout URLs\n        ",
+      "inputSchema": {
+        "properties": {},
+        "title": "get_pricingArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "get_pricingOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "get_tool_costs",
+      "description": "Get per-tool credit costs for all PlayKit MCP tools.\n\n        Returns which tools are free (JSON lookups, no LLM cost) and which\n        cost credits (LLM-powered), plus the credit cost per call.\n\n        Use this to estimate the total cost of a workflow before executing it.\n\n        This tool does not require authentication.\n\n        Returns:\n            JSON with metered_tools (cost 1 credit each) and free_tools (cost 0)\n        ",
+      "inputSchema": {
+        "properties": {},
+        "title": "get_tool_costsArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "get_tool_costsOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "get_usage",
+      "description": "Get your current PlayKit usage, remaining credits, and tier info.\n\n        Returns:\n        - Current tier (free, builder, pro, agency)\n        - Credits consumed this billing period\n        - Credits remaining\n        - Tier limits\n        - Upgrade URL\n\n        Requires authentication via X-API-Key header.\n\n        Returns:\n            JSON with tier, consumed, credited, remaining, and upgrade info\n        ",
+      "inputSchema": {
+        "properties": {},
+        "title": "get_usageArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "get_usageOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "clay_connect",
+      "description": "\n        Connect to Clay by providing your session cookie.\n\n        Each user must call this once per session to enable Clay API tools.\n        The cookie is stored in memory for your account only.\n\n        How to get your cookie:\n        1. Open Clay in Chrome\n        2. DevTools (Cmd+Shift+I) > Network tab\n        3. Click any request to api.clay.com\n        4. Copy the full Cookie header value\n\n        Args:\n            session_cookie: The full cookie string from your Clay browser session.\n\n        Returns:\n            Connection status with workspace info if successful.\n        ",
+      "inputSchema": {
+        "properties": {
+          "session_cookie": {
+            "title": "Session Cookie",
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_cookie"
+        ],
+        "title": "clay_connectArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "clay_connectOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "clay_status",
+      "description": "\n        Check Clay API connection status.\n\n        Shows whether you're connected, which workspaces you have access to,\n        and how the session cookie was provided (clay_connect vs env var).\n\n        Returns:\n            Connection status with workspace details.\n        ",
+      "inputSchema": {
+        "properties": {},
+        "title": "clay_statusArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "clay_statusOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "clay_list_tables",
+      "description": "\n        Browse Clay tables in a workspace or workbook. Accepts any Clay URL.\n\n        Just paste a Clay URL and this tool figures out what to show you:\n        - Folder URL → lists all workbooks/tables in that folder (recursive)\n        - Workbook URL → lists all tables in the workbook\n        - Table URL → returns the table's column schema\n        - Workspace URL → lists all resources (tables, workbooks, folders)\n\n        Next steps after listing tables:\n        - To read a table's schema: clay_get_schema(table_id)\n        - To audit a table for optimizations: clay_audit_table(table_id)\n        - To document a table with ASCII diagrams: clay_document_table(table_id)\n        - To export data from a table: clay_export_data(table_id)\n\n        Args:\n            workspace_id: The numeric workspace ID. Omit to list available workspaces.\n            search: Optional search query to filter resources by name.\n            url: Optional Clay URL. Supports:\n                - Workbook URL: https://app.clay.com/workspaces/123/workbooks/wb_abc/...\n                  → lists all tables in that workbook\n                - Folder URL: https://app.clay.com/workspaces/123/folders/f_abc/...\n                  → lists all workbooks/tables under that folder (recursive)\n                - Workspace URL: https://app.clay.com/workspaces/123/...\n                  → lists all resources in that workspace\n                - Table URL: https://app.clay.com/workspaces/123/workbooks/wb_abc/tables/t_xyz\n                  → returns that table's info directly\n            include_archived: Include archived folders/workbooks/tables in results.\n                Default is False (archived resources are excluded).\n\n        Returns:\n            JSON list of tables/resources.\n        ",
+      "inputSchema": {
+        "properties": {
+          "workspace_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Workspace Id"
+          },
+          "search": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Search"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Url"
+          },
+          "include_archived": {
+            "default": false,
+            "title": "Include Archived",
+            "type": "boolean"
+          }
+        },
+        "title": "clay_list_tablesArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "clay_list_tablesOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "clay_get_schema",
+      "description": "\n        Get the full schema of a Clay table (columns, types, enrichments, formulas).\n\n        Returns complete table metadata including all fields/columns with their\n        types, enrichment configurations, formula definitions, and view information.\n\n        Args:\n            table_id: A table ID (t_abc123), workbook ID (wb_xyz), or full Clay URL.\n                If a workbook ID or URL is passed, resolves to table(s) inside it.\n            compact: When True, removes non-essential typeSettings fields to reduce\n                payload size and avoid tool output overflow on large tables.\n\n        Returns:\n            JSON table schema with columns, types, sources, and views.\n        ",
+      "inputSchema": {
+        "properties": {
+          "table_id": {
+            "title": "Table Id",
+            "type": "string"
+          },
+          "compact": {
+            "default": false,
+            "title": "Compact",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "table_id"
+        ],
+        "title": "clay_get_schemaArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "clay_get_schemaOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "clay_add_rows",
+      "description": "\n        Add rows to a Clay table.\n\n        Automatically detects webhook-sourced tables and routes data through\n        the webhook URL (using column names as keys). For non-webhook tables,\n        uses the direct API (requires column field IDs from clay_get_schema).\n\n        Args:\n            table_id: The table ID (e.g., \"t_abc123\").\n            rows_json: JSON string — either a single object or an array of objects.\n                For webhook tables: use column names as keys (e.g., {\"Company\": \"Acme\"}).\n                For regular tables: use field IDs as keys (e.g., {\"f_abc123\": \"Acme\"}).\n\n        Returns:\n            Confirmation with number of rows added and method used (webhook or api).\n        ",
+      "inputSchema": {
+        "properties": {
+          "table_id": {
+            "title": "Table Id",
+            "type": "string"
+          },
+          "rows_json": {
+            "title": "Rows Json",
+            "type": "string"
+          }
+        },
+        "required": [
+          "table_id",
+          "rows_json"
+        ],
+        "title": "clay_add_rowsArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "clay_add_rowsOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "clay_run_enrichments",
+      "description": "\n        Run an enrichment column on records in a Clay table.\n\n        Triggers an enrichment provider to run on records in a specific view.\n        Use clay_get_schema to find field IDs and view IDs.\n\n        Args:\n            table_id: The table ID.\n            view_id: The view ID (e.g., \"gv_xxx\"). Records in this view will be enriched.\n            field_id: The enrichment column/field ID to run.\n            num_records: Optional limit on number of records to enrich. Omit for all.\n\n        Returns:\n            Enrichment run confirmation.\n        ",
+      "inputSchema": {
+        "properties": {
+          "table_id": {
+            "title": "Table Id",
+            "type": "string"
+          },
+          "view_id": {
+            "title": "View Id",
+            "type": "string"
+          },
+          "field_id": {
+            "title": "Field Id",
+            "type": "string"
+          },
+          "num_records": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Num Records"
+          }
+        },
+        "required": [
+          "table_id",
+          "view_id",
+          "field_id"
+        ],
+        "title": "clay_run_enrichmentsArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "clay_run_enrichmentsOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "clay_export_data",
+      "description": "\n        Export row data from a Clay table as JSON.\n\n        Fetches all (or limited) rows with human-readable column names.\n        Returns a summary with sample rows and full data.\n\n        Args:\n            table_id: A table ID (t_abc123), workbook ID (wb_xyz), or full Clay URL.\n                If a workbook ID or URL is passed, resolves to the first table and exports its data.\n            max_rows: Maximum number of rows to export. Omit for all rows.\n            columns: Optional comma-separated column names to include.\n                Example: \"Company Name, Email, LinkedIn URL\"\n\n        Returns:\n            JSON with table info, column list, sample rows, and full data array.\n        ",
+      "inputSchema": {
+        "properties": {
+          "table_id": {
+            "title": "Table Id",
+            "type": "string"
+          },
+          "max_rows": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Max Rows"
+          },
+          "columns": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Columns"
+          }
+        },
+        "required": [
+          "table_id"
+        ],
+        "title": "clay_export_dataArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "clay_export_dataOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "clay_get_credits",
+      "description": "\n        Get Clay credit usage report for a workspace.\n\n        Shows credit consumption across providers and tables for a date range.\n        Useful for monitoring spend and optimizing enrichment costs.\n\n        Args:\n            workspace_id: The numeric workspace ID (from clay_list_tables).\n            start_date: Start date in ISO format (e.g., \"2024-01-01\").\n            end_date: End date in ISO format (e.g., \"2024-01-31\").\n\n        Returns:\n            Credit usage breakdown by provider, table, and time period.\n        ",
+      "inputSchema": {
+        "properties": {
+          "workspace_id": {
+            "title": "Workspace Id",
+            "type": "integer"
+          },
+          "start_date": {
+            "title": "Start Date",
+            "type": "string"
+          },
+          "end_date": {
+            "title": "End Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workspace_id",
+          "start_date",
+          "end_date"
+        ],
+        "title": "clay_get_creditsArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "clay_get_creditsOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "ask_clay",
+      "description": "\n        Ask any question about Clay. Uses intent routing for fast factual answers.\n\n        Routes queries to the fastest available path:\n        - Integration facts (BYOA, inputs/outputs) → JSON lookup (<10ms)\n        - Capability queries (\"which providers...\") → JSON filter (<50ms)\n        - Waterfall paths (\"from domain to phone\") → Graph traversal (<100ms)\n        - Conceptual questions → Semantic search + LLM (2-5 sec)\n\n        Args:\n            question: Your Clay question. Works best with specific queries.\n                Fast path examples (instant answers):\n                - \"Does Apollo require BYOA?\"\n                - \"What outputs does Hunter provide?\"\n                - \"Which providers output phone without BYOA?\"\n                Conceptual examples (semantic search):\n                - \"How does waterfall enrichment work?\"\n                - \"When should I use Claygent vs AI Node?\"\n                - \"What are best practices for job change signals?\"\n\n        Returns:\n            Grounded answer based ONLY on Clay knowledge base, with confidence\n            indicator (HIGH/MEDIUM/LOW) and source attribution.\n        ",
+      "inputSchema": {
+        "properties": {
+          "question": {
+            "title": "Question",
+            "type": "string"
+          }
+        },
+        "required": [
+          "question"
+        ],
+        "title": "ask_clayArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "ask_clayOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "find_integrations",
+      "description": "\n        Find Clay integrations — by name OR by capability filters.\n\n        Two modes:\n        1. Name lookup: find_integrations(name=\"apollo\") → detailed info for one provider\n        2. Capability filter: find_integrations(outputs=\"email\", inputs=\"domain\") → matching providers\n\n        Args:\n            name: Integration name for direct lookup (e.g., \"apollo\", \"hubspot\", \"builtwith\").\n                  When provided, returns detailed info for that specific provider.\n            outputs: Output types to filter by (comma-separated).\n                     Options: phone, email, tech_stack, intent_signals, job_changes,\n                     company_data, contact_data, linkedin_url\n            inputs: Input types to filter by (comma-separated).\n                    Options: domain, email, linkedin_url, company_name, name_company, ip_address\n            byoa: Filter by BYOA requirement (True = requires own API key, False = uses Clay credits)\n            limit: Maximum results for capability filter (default 20)\n\n        Returns:\n            Detailed provider info (name mode) or filtered list (capability mode).\n\n        Examples:\n            find_integrations(name=\"prospeo\")\n            find_integrations(outputs=\"email\", inputs=\"domain\")\n            find_integrations(outputs=\"phone\", byoa=False)\n        ",
+      "inputSchema": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Name"
+          },
+          "outputs": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Outputs"
+          },
+          "inputs": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Inputs"
+          },
+          "byoa": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Byoa"
+          },
+          "limit": {
+            "default": 20,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "title": "find_integrationsArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "find_integrationsOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "compare_providers",
+      "description": "\n        Compare Clay data providers for a specific use case.\n\n        Uses structured graph data for instant BYOA/inputs/outputs comparison,\n        enriched with RAG documentation for qualitative insights on coverage,\n        accuracy, and best-fit scenarios.\n\n        Args:\n            use_case: The data enrichment goal you're comparing providers for.\n                Examples: \"email enrichment\", \"phone number lookup\",\n                \"tech stack detection\", \"intent signals\", \"job change tracking\",\n                \"VP Sales, Director Sales Development at B2B companies\"\n            providers: Optional comma-separated list of providers to compare.\n                Examples: \"Apollo, ZoomInfo, Hunter\" or \"BuiltWith, Wappalyzer, Datanyze\"\n                If not provided, auto-discovers relevant providers based on use_case/category.\n            category: Optional category to filter providers by output type.\n                Examples: \"find_people\", \"find_email\", \"find_phone\", \"tech_stack\", \"intent\"\n                Maps to output types: find_people→contact_data, find_email→email, etc.\n            max_providers: Maximum providers to compare (default 6). Increase for broader comparison.\n\n        Returns:\n            Comparison table with coverage quality, cost tier, BYOA status,\n            best-fit scenarios, limitations, and waterfall sequence recommendation.\n        ",
+      "inputSchema": {
+        "properties": {
+          "use_case": {
+            "title": "Use Case",
+            "type": "string"
+          },
+          "providers": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Providers"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Category"
+          },
+          "max_providers": {
+            "default": 6,
+            "title": "Max Providers",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "use_case"
+        ],
+        "title": "compare_providersArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "compare_providersOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "get_play_catalog",
+      "description": "\n        Discover plays and patterns from the PlayKit catalog.\n\n        This tool enables DISCOVERY-FIRST brainstorming by letting you see\n        ALL available plays before doing targeted searches. Instead of searching\n        for what you already know, you can browse what's possible.\n\n        Args:\n            query: Optional search query to filter plays/patterns by keyword\n            category: Filter by category: outbound-prospecting, lead-generation,\n                      contact-enrichment, company-intelligence, signal-detection,\n                      account-based, data-quality, crm-automation, web-scraping,\n                      inbound-enrichment, customer-lifecycle, workflow-integration\n            full_catalog: Return the entire catalog (for comprehensive context)\n            summary_only: Return just a text summary of available plays\n\n        Returns:\n            JSON catalog of plays and patterns, or text summary\n\n        Use Cases:\n            - \"What plays exist for outbound?\" → get_play_catalog(category=\"outbound\")\n            - \"Show me everything about waterfalls\" → get_play_catalog(query=\"waterfall\")\n            - \"What can I do with job change signals?\" → get_play_catalog(query=\"job change\")\n            - \"Give me the full picture\" → get_play_catalog(full_catalog=True)\n\n        This is the FIRST tool to call when brainstorming - it shows you the landscape\n        before you do targeted deep-dives with ask_clay or brainstorm_play.\n        ",
+      "inputSchema": {
+        "properties": {
+          "query": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Query"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Category"
+          },
+          "full_catalog": {
+            "default": false,
+            "title": "Full Catalog",
+            "type": "boolean"
+          },
+          "summary_only": {
+            "default": false,
+            "title": "Summary Only",
+            "type": "boolean"
+          }
+        },
+        "title": "get_play_catalogArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "get_play_catalogOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "brainstorm_play",
+      "description": "\n        Brainstorm creative Clay plays for a GTM use case.\n\n        Uses Skills (methodology), RAG (integration data from 1,834 docs), and\n        Catalog (play landscape awareness) to suggest plays using NATIVE Clay\n        capabilities. No bulk compendium loading — progressive context only.\n\n        Args:\n            use_case: Describe the company/industry AND the angle you want to explore.\n                Examples:\n                - \"B2B gifting platform (like Sendoso) - job change signals\"\n                - \"AI coding assistant - competitor displacement plays\"\n                - \"Enterprise security - intent signals and tech stack changes\"\n                - \"Healthcare SaaS - timing triggers like fiscal year and budget cycles\"\n\n        Returns:\n            3-5 creative plays with specific integrations, workflows, Claygent prompts,\n            and cost/BYOA considerations. Each play follows the FETC framework:\n            Source → Filter → Enrich → AI Process → Destination.\n        ",
+      "inputSchema": {
+        "properties": {
+          "use_case": {
+            "title": "Use Case",
+            "type": "string"
+          }
+        },
+        "required": [
+          "use_case"
+        ],
+        "title": "brainstorm_playArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "brainstorm_playOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "claygent_prompts",
+      "description": "\n        Generate thorough, human-like AI prompts for Clay workflows.\n\n        Thinks through the task like a human researcher would - breaking down\n        the goal, identifying where to find the data, considering edge cases,\n        and providing step-by-step instructions with fallback logic.\n\n        Args:\n            task: The data enrichment or analysis task you need to accomplish.\n                Web research tasks (use Claygent):\n                - \"find conference attendance for contacts\"\n                - \"scrape LinkedIn post text\"\n                - \"research company news and recent announcements\"\n                - \"find podcast appearances\"\n                - \"extract pricing from competitor websites\"\n                Table data tasks (use AI Node):\n                - \"classify leads by ICP fit\"\n                - \"score accounts based on tech stack\"\n                - \"generate personalized first lines\"\n                - \"summarize company descriptions\"\n\n        Returns:\n            1-3 production-ready prompts with:\n            - Human reasoning for why this approach works\n            - Step-by-step instructions inside the prompt\n            - Fallback logic for when primary approach fails\n            - Edge case handling\n            - Expected JSON output schema\n            - Parsing tips and common gotchas\n        ",
+      "inputSchema": {
+        "properties": {
+          "task": {
+            "title": "Task",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task"
+        ],
+        "title": "claygent_promptsArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "claygent_promptsOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "design_clay",
+      "description": "\n        Design a complete Clay workflow — from single tables to multi-table architectures.\n\n        The agent decides the right architecture based on your use case. Most GTM\n        plays are hub-spoke (Company → People → Outreach). Simple enrichment-only\n        workflows may get a single table.\n\n        Args:\n            use_case: What you want to build in Clay.\n                Examples:\n                - \"Waterfall email enrichment for outbound SDR team\"\n                - \"ABM multi-threading for 500 target accounts with Salesforce sync\"\n                - \"Champion job change tracking for 10K customers\"\n                - \"Tech stack detection for competitor displacement\"\n                - \"Inbound lead enrichment from website forms to Outreach sequences\"\n\n            volume: Expected data volume. Affects architecture recommendations.\n                Options: \"low\" (<1K records), \"medium\" (1K-10K), \"high\" (10K-100K),\n                        \"very_high\" (100K+). Default: \"medium\"\n\n            output_format: Output format.\n                - \"markdown\" (default): Human-readable workflow design with explanations.\n                - \"build_spec\": JSON spec ready for clay_build_table(). Returns a\n                  tables array with connections, status columns, and credit estimates.\n                  Pass the output directly to clay_build_table(table_spec_json=...).\n\n        Returns:\n            Markdown design (default) or JSON build spec for clay_build_table.\n        ",
+      "inputSchema": {
+        "properties": {
+          "use_case": {
+            "title": "Use Case",
+            "type": "string"
+          },
+          "volume": {
+            "default": "medium",
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "very_high"
+            ],
+            "title": "Volume",
+            "type": "string"
+          },
+          "output_format": {
+            "default": "markdown",
+            "enum": [
+              "markdown",
+              "build_spec"
+            ],
+            "title": "Output Format",
+            "type": "string"
+          }
+        },
+        "required": [
+          "use_case"
+        ],
+        "title": "design_clayArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "design_clayOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "write_outreach",
+      "description": "\n        Generate personalized outreach copy using Clay enrichment data.\n\n        Creates cold email sequences and LinkedIn messages that leverage your\n        Clay enrichments for maximum personalization. Completes the GTM loop:\n        Find → Enrich → Personalize → SEND.\n\n        Args:\n            context: Full campaign context including target audience, available enrichments,\n                and outreach goal. Describe everything in one parameter.\n                Examples:\n                - \"Competitor displacement targeting VP Sales at Outreach users. We have\n                   tech stack, Claygent research, company news. Goal: book discovery calls\n                   for Sendoso, an AI gifting platform.\"\n                - \"Job change campaign for champion tracking. Enrichments: previous company,\n                   new role, mutual connections. Goal: re-engage churned contacts at new company.\"\n                - \"ABM multi-threading into enterprise accounts. Have org chart, tech stack,\n                   funding data. Goal: get intro to procurement from existing champion.\"\n\n            tone: Writing style for the copy. Default: \"professional\"\n                Options: \"professional\", \"casual\", \"provocative\", \"consultative\"\n\n            num_emails: Number of emails in the sequence. Default: 3\n\n        Returns:\n            Complete outreach package:\n            - Email sequence with subject lines (default 3 emails)\n            - LinkedIn connection request + follow-up message\n            - Which enrichments to use in each touchpoint (and why)\n            - Clay variable syntax: {{field_name}}\n            - Personalization hooks and talk tracks\n        ",
+      "inputSchema": {
+        "properties": {
+          "context": {
+            "title": "Context",
+            "type": "string"
+          },
+          "tone": {
+            "default": "professional",
+            "enum": [
+              "professional",
+              "casual",
+              "provocative",
+              "consultative"
+            ],
+            "title": "Tone",
+            "type": "string"
+          },
+          "num_emails": {
+            "default": 3,
+            "title": "Num Emails",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "context"
+        ],
+        "title": "write_outreachArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "write_outreachOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "generate_icp",
+      "description": "\n        Generate an Ideal Customer Profile (ICP) for a company.\n\n        Scrapes the company's website to understand their product, then generates\n        a complete ICP with target segments, buyer personas, pain points, and\n        signal triggers for Clay workflows.\n\n        Args:\n            company_url: The company's website URL (e.g., \"sendoso.com\" or \"https://sendoso.com\").\n                Will be scraped to extract product info, use cases, and target market.\n            context: Optional additional context about the company or focus areas.\n                Examples: \"B2B gifting platform\", \"focus on enterprise segment\",\n                \"we sell to marketing leaders\"\n\n        Returns:\n            Complete ICP report with:\n            - Company summary and value proposition\n            - 3-5 target segments with firmographic criteria\n            - Buyer personas with titles, pain points, and triggers\n            - Signal triggers for Clay workflows (job changes, funding, hiring, etc.)\n            - Recommended Clay plays for each segment\n        ",
+      "inputSchema": {
+        "properties": {
+          "company_url": {
+            "title": "Company Url",
+            "type": "string"
+          },
+          "context": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Context"
+          }
+        },
+        "required": [
+          "company_url"
+        ],
+        "title": "generate_icpArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "generate_icpOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "clay_build_table",
+      "description": "\n        Build a complete Clay table from a spec — including action/enrichment columns.\n\n        This is the final step in the brainstorm → design → build loop.\n        Takes a build spec JSON (from design_clay or hand-crafted) and creates\n        everything in Clay via API: workbook, table, input columns, formulas,\n        and action columns (enrichments, AI actions, waterfalls) with full\n        input bindings and conditional run logic.\n\n        Args:\n            workspace_id: The numeric workspace ID.\n            table_spec_json: JSON object with table_name and columns array. Each column:\n                - name: Column name (required)\n                - type: text, url, number, formula, action, etc. (required)\n                - formula: Formula text using {{Column Name}} refs (for type=formula)\n                - actionKey: Enrichment slug (for type=action), e.g. \"enrich-company-with-mixrank-v2\"\n                - actionVersion: Action version, default 1 (for type=action)\n                - actionPackageId: Package UUID (for type=action, optional)\n                - inputsBinding: List of {\"name\": ..., \"formulaText\": ...} (for type=action)\n                - conditionalRunFormulaText: When to run (for type=action, optional)\n\n                Example:\n                {\n                    \"table_name\": \"My Table\",\n                    \"columns\": [\n                        {\"name\": \"Domain\", \"type\": \"text\"},\n                        {\"name\": \"Enrich\", \"type\": \"action\", \"actionKey\": \"enrich-company-with-mixrank-v2\",\n                         \"inputsBinding\": [{\"name\": \"company_identifier\", \"formulaText\": \"{{Domain}}\"}]},\n                        {\"name\": \"Industry\", \"type\": \"formula\", \"formula\": \"{{Enrich}}?.industry\"}\n                    ]\n                }\n            workbook_name: Optional workbook name. Defaults to table_name.\n\n        Returns:\n            JSON with table URL, columns created/failed, and field ID mapping.\n        ",
+      "inputSchema": {
+        "properties": {
+          "workspace_id": {
+            "title": "Workspace Id",
+            "type": "integer"
+          },
+          "table_spec_json": {
+            "title": "Table Spec Json",
+            "type": "string"
+          },
+          "workbook_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Workbook Name"
+          }
+        },
+        "required": [
+          "workspace_id",
+          "table_spec_json"
+        ],
+        "title": "clay_build_tableArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "clay_build_tableOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "clay_build_webhook_table",
+      "description": "\n        Create a Clay table with a webhook source and optionally seed it with rows.\n\n        One call does everything: creates a workbook, table, columns (with full\n        dependency resolution), attaches a webhook source, retrieves the webhook URL,\n        and optionally populates initial rows. The returned webhook URL can be used\n        to programmatically POST data to Clay from any external system.\n\n        Args:\n            workspace_id: The numeric workspace ID.\n            table_spec_json: JSON object with table_name and columns array.\n                Same format as clay_build_table — supports text, url, number,\n                formula, action columns with full dependency resolution.\n\n                Example:\n                {\n                    \"table_name\": \"Inbound Leads\",\n                    \"columns\": [\n                        {\"name\": \"Company\", \"type\": \"text\"},\n                        {\"name\": \"Domain\", \"type\": \"url\"},\n                        {\"name\": \"Contact Email\", \"type\": \"text\"},\n                        {\"name\": \"Source\", \"type\": \"text\"},\n                        {\"name\": \"Enrich Company\", \"type\": \"action\",\n                         \"actionKey\": \"enrich-company-with-mixrank-v2\",\n                         \"inputsBinding\": [{\"name\": \"company_identifier\", \"formulaText\": \"{{Domain}}\"}]}\n                    ]\n                }\n            webhook_name: Display name for the webhook source (default: \"Webhook\").\n            seed_rows_json: Optional JSON array of row objects to insert after table\n                creation. Keys are column names (not field IDs — auto-translated).\n\n                Example:\n                [\n                    {\"Company\": \"Acme Corp\", \"Domain\": \"acme.com\", \"Contact Email\": \"jane@acme.com\"},\n                    {\"Company\": \"Globex\", \"Domain\": \"globex.com\", \"Contact Email\": \"bob@globex.com\"}\n                ]\n            workbook_name: Optional workbook name. Defaults to table_name.\n\n        Returns:\n            JSON with table URL, webhook URL, curl example, columns created,\n            seed row status, and the 50K submission limit warning.\n\n        Notes:\n            - Webhook URLs have a 50,000 submission lifetime limit on standard plans.\n            - Bursts >100 events/minute will queue.\n            - Seed rows count toward the 50K limit.\n            - Enterprise plans can enable auto-delete for unlimited submissions.\n        ",
+      "inputSchema": {
+        "properties": {
+          "workspace_id": {
+            "title": "Workspace Id",
+            "type": "integer"
+          },
+          "table_spec_json": {
+            "title": "Table Spec Json",
+            "type": "string"
+          },
+          "webhook_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": "Webhook",
+            "title": "Webhook Name"
+          },
+          "seed_rows_json": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Seed Rows Json"
+          },
+          "workbook_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Workbook Name"
+          }
+        },
+        "required": [
+          "workspace_id",
+          "table_spec_json"
+        ],
+        "title": "clay_build_webhook_tableArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "clay_build_webhook_tableOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "clay_audit_table",
+      "description": "\n        Audit a Clay table and recommend optimizations. PlayKit-exclusive.\n\n        Performs deep analysis of column architecture, enrichment strategy, cost\n        efficiency, AI tool selection, waterfall patterns, and anti-patterns.\n        Returns a scored audit with actionable recommendations.\n\n        Uses PlayKit's full methodology: integration graph (215 providers),\n        knowledge base (1,834+ docs), skills (29 vertical/horizontal), and\n        building blocks catalog.\n\n        Args:\n            table_id: A table ID (t_abc123), workbook ID (wb_xyz), or full Clay URL.\n            workspace_id: Optional workspace ID. If provided, includes actual credit\n                usage data in the audit. Get from clay_list_tables.\n            depth: \"quick\" — fast programmatic checks only (no LLM, <5s).\n                \"deep\" (default) — full audit with agent analysis, strategic\n                recommendations, and knowledge base cross-reference (~15-30s).\n            response_format: \"markdown\" (default) preserves the historical tool\n                contract. Use \"json\" to return a structured payload with the\n                markdown report in `result` and parsed credit usage in\n                `credit_usage`.\n\n        Returns:\n            Markdown audit report by default, or a JSON envelope when\n            response_format=\"json\".\n        ",
+      "inputSchema": {
+        "properties": {
+          "table_id": {
+            "title": "Table Id",
+            "type": "string"
+          },
+          "workspace_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Workspace Id"
+          },
+          "depth": {
+            "default": "deep",
+            "enum": [
+              "quick",
+              "deep"
+            ],
+            "title": "Depth",
+            "type": "string"
+          },
+          "response_format": {
+            "default": "markdown",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "title": "Response Format",
+            "type": "string"
+          }
+        },
+        "required": [
+          "table_id"
+        ],
+        "title": "clay_audit_tableArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "clay_audit_tableOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "clay_document_table",
+      "description": "\n        Generate beautiful, shareable documentation of a Clay table.\n\n        Creates a complete document with ASCII-art diagrams showing the table's\n        column architecture, data flow, enrichment chains, waterfall patterns,\n        and conditional logic. Designed for git tracking and client sharing.\n\n        Args:\n            table_id: A table ID (t_abc123), workbook ID (wb_xyz), or full Clay URL.\n            output_format: \"full\" (default) — complete doc with all sections and diagrams.\n                \"compact\" — shorter version with column table + flow diagram only.\n            response_format: \"markdown\" (default) preserves the historical tool\n                contract. Use \"json\" to return a structured payload with the\n                rendered markdown in `result` and parsed documentation data in\n                `data`.\n\n        Returns:\n            Markdown documentation by default, or a JSON envelope when\n            response_format=\"json\".\n        ",
+      "inputSchema": {
+        "properties": {
+          "table_id": {
+            "title": "Table Id",
+            "type": "string"
+          },
+          "output_format": {
+            "default": "full",
+            "enum": [
+              "full",
+              "compact"
+            ],
+            "title": "Output Format",
+            "type": "string"
+          },
+          "response_format": {
+            "default": "markdown",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "title": "Response Format",
+            "type": "string"
+          }
+        },
+        "required": [
+          "table_id"
+        ],
+        "title": "clay_document_tableArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "clay_document_tableOutput",
+        "type": "object"
+      }
+    }
+  ],
+  "resources": [],
+  "resourceTemplates": [],
+  "prompts": [],
+  "skills": [
+    {
+      "dirName": "setup-and-auth",
+      "title": "Setup and Auth",
+      "description": "Confirm access, auth state, and session readiness before running operational workflows.",
+      "toolNames": [
+        "clay_connect",
+        "clay_status"
+      ],
+      "resourceUris": [],
+      "resourceTemplateUris": [],
+      "promptNames": []
+    },
+    {
+      "dirName": "workflow-design",
+      "title": "Workflow Design",
+      "description": "Define strategy, prompts, targeting, and workflow shape before building tables or running enrichments.",
+      "toolNames": [
+        "brainstorm_play",
+        "claygent_prompts",
+        "design_clay",
+        "generate_icp",
+        "get_play_catalog",
+        "write_outreach"
+      ],
+      "resourceUris": [],
+      "resourceTemplateUris": [],
+      "promptNames": []
+    },
+    {
+      "dirName": "table-operations",
+      "title": "Table Operations",
+      "description": "Build, inspect, run, document, and export tables, rows, and enrichment workflows.",
+      "toolNames": [
+        "clay_add_rows",
+        "clay_audit_table",
+        "clay_build_table",
+        "clay_build_webhook_table",
+        "clay_document_table",
+        "clay_export_data",
+        "clay_get_schema",
+        "clay_list_tables",
+        "clay_run_enrichments"
+      ],
+      "resourceUris": [],
+      "resourceTemplateUris": [],
+      "promptNames": []
+    },
+    {
+      "dirName": "provider-research",
+      "title": "Provider Research",
+      "description": "Compare providers, integrations, and capability tradeoffs before choosing a workflow.",
+      "toolNames": [
+        "ask_clay",
+        "compare_providers",
+        "find_integrations"
+      ],
+      "resourceUris": [],
+      "resourceTemplateUris": [],
+      "promptNames": []
+    },
+    {
+      "dirName": "account-and-usage",
+      "title": "Account and Usage",
+      "description": "Check pricing, usage, limits, credits, and upgrade context for the current account.",
+      "toolNames": [
+        "clay_get_credits",
+        "get_pricing",
+        "get_tool_costs",
+        "get_usage"
+      ],
+      "resourceUris": [],
+      "resourceTemplateUris": [],
+      "promptNames": []
+    }
+  ],
+  "managedFiles": [
+    "pluxx.config.ts",
+    "./INSTRUCTIONS.md",
+    "skills/setup-and-auth/SKILL.md",
+    "commands/setup-and-auth.md",
+    "skills/workflow-design/SKILL.md",
+    "commands/workflow-design.md",
+    "skills/table-operations/SKILL.md",
+    "commands/table-operations.md",
+    "skills/provider-research/SKILL.md",
+    "commands/provider-research.md",
+    "skills/account-and-usage/SKILL.md",
+    "commands/account-and-usage.md",
+    "scripts/check-env.sh",
+    ".pluxx/taxonomy.json",
+    ".pluxx/mcp.json"
+  ]
+}

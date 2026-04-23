@@ -1,0 +1,29 @@
+---
+description: "Check pricing, usage, limits, credits, and upgrade context for the current account."
+argument-hint: "[id] [start-date]"
+---
+
+<!-- pluxx:generated:start -->
+Use this command when the user asks to check pricing, usage, limits, credits, and upgrade context for the current account.
+
+Arguments: $ARGUMENTS
+
+Primary tools:
+- `clay_get_credits`
+- `get_pricing`
+- `get_tool_costs`
+- `get_usage`
+
+Workflow:
+
+1. Interpret `$ARGUMENTS` as the user request for this workflow.
+2. Choose the most specific tool in this surface.
+3. Ask for missing required inputs only if the request does not already provide them.
+4. Return a concise task-focused answer instead of raw JSON unless the user asks for it.
+<!-- pluxx:generated:end -->
+
+## Custom Notes
+
+<!-- pluxx:custom:start -->
+Add custom guidance, examples, or caveats here. This section is preserved across `pluxx sync --from-mcp`.
+<!-- pluxx:custom:end -->

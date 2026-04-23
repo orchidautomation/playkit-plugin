@@ -1,0 +1,152 @@
+{
+  "version": 1,
+  "plugin": {
+    "name": "playkit",
+    "displayName": "PlayKit",
+    "targets": [
+      "claude-code",
+      "opencode",
+      "codex",
+      "cursor"
+    ]
+  },
+  "mcp": {
+    "metadataPath": ".pluxx/mcp.json",
+    "toolCount": 24,
+    "serverName": "clay-knowledge",
+    "transport": "http",
+    "auth": "header via X-API-Key from PLAYKIT_API_KEY"
+  },
+  "contextInputs": [],
+  "files": {
+    "editable": [
+      {
+        "path": ".pluxx/taxonomy.json"
+      },
+      {
+        "path": "INSTRUCTIONS.md",
+        "managedSections": [
+          {
+            "start": "<!-- pluxx:generated:start -->",
+            "end": "<!-- pluxx:generated:end -->"
+          }
+        ]
+      },
+      {
+        "path": "skills/setup-and-auth/SKILL.md",
+        "managedSections": [
+          {
+            "start": "<!-- pluxx:generated:start -->",
+            "end": "<!-- pluxx:generated:end -->"
+          }
+        ]
+      },
+      {
+        "path": "skills/workflow-design/SKILL.md",
+        "managedSections": [
+          {
+            "start": "<!-- pluxx:generated:start -->",
+            "end": "<!-- pluxx:generated:end -->"
+          }
+        ]
+      },
+      {
+        "path": "skills/table-operations/SKILL.md",
+        "managedSections": [
+          {
+            "start": "<!-- pluxx:generated:start -->",
+            "end": "<!-- pluxx:generated:end -->"
+          }
+        ]
+      },
+      {
+        "path": "skills/provider-research/SKILL.md",
+        "managedSections": [
+          {
+            "start": "<!-- pluxx:generated:start -->",
+            "end": "<!-- pluxx:generated:end -->"
+          }
+        ]
+      },
+      {
+        "path": "skills/account-and-usage/SKILL.md",
+        "managedSections": [
+          {
+            "start": "<!-- pluxx:generated:start -->",
+            "end": "<!-- pluxx:generated:end -->"
+          }
+        ]
+      },
+      {
+        "path": "commands/setup-and-auth.md",
+        "managedSections": [
+          {
+            "start": "<!-- pluxx:generated:start -->",
+            "end": "<!-- pluxx:generated:end -->"
+          }
+        ]
+      },
+      {
+        "path": "commands/workflow-design.md",
+        "managedSections": [
+          {
+            "start": "<!-- pluxx:generated:start -->",
+            "end": "<!-- pluxx:generated:end -->"
+          }
+        ]
+      },
+      {
+        "path": "commands/table-operations.md",
+        "managedSections": [
+          {
+            "start": "<!-- pluxx:generated:start -->",
+            "end": "<!-- pluxx:generated:end -->"
+          }
+        ]
+      },
+      {
+        "path": "commands/provider-research.md",
+        "managedSections": [
+          {
+            "start": "<!-- pluxx:generated:start -->",
+            "end": "<!-- pluxx:generated:end -->"
+          }
+        ]
+      },
+      {
+        "path": "commands/account-and-usage.md",
+        "managedSections": [
+          {
+            "start": "<!-- pluxx:generated:start -->",
+            "end": "<!-- pluxx:generated:end -->"
+          }
+        ]
+      }
+    ],
+    "protected": [
+      "pluxx.config.ts",
+      "pluxx.config.js",
+      "pluxx.config.json",
+      "pluxx.agent.md",
+      ".pluxx/mcp.json",
+      "dist/"
+    ],
+    "generated": [
+      ".pluxx/agent/context.md",
+      ".pluxx/agent/plan.json"
+    ]
+  },
+  "successCriteria": [
+    "Each skill represents a real user workflow or product surface.",
+    "Setup/admin/account tools are grouped intentionally.",
+    "Examples are concrete and realistic.",
+    "Weak MCP metadata is surfaced before publishing.",
+    "Only Pluxx-managed sections are modified."
+  ],
+  "caveats": [
+    "[warning] codex-hooks-external-config: Codex plugin docs currently separate hook configuration from plugin packaging, so Pluxx emits hook guidance as external Codex config rather than as a plugin-bundled hook surface. Pluxx will generate `.codex/hooks.generated.json` as a mirror, but you still need to copy or adapt it into `~/.codex/hooks.json` or `<repo>/.codex/hooks.json` and enable `codex_hooks = true` in Codex itself.",
+    "[warning] primitive-degrade-summary: On codex, these active compiler buckets will compile to weaker native equivalents: commands.",
+    "[warning] primitive-translate-summary: On opencode, these active compiler buckets will be re-expressed through different native surfaces: hooks.",
+    "[warning] primitive-translate-summary: On codex, these active compiler buckets will be re-expressed through different native surfaces: hooks."
+  ]
+}

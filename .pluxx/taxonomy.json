@@ -1,0 +1,61 @@
+[
+  {
+    "dirName": "setup-and-auth",
+    "title": "Setup and Auth",
+    "description": "Confirm access, auth state, and session readiness before running operational workflows.",
+    "toolNames": [
+      "clay_connect",
+      "clay_status"
+    ]
+  },
+  {
+    "dirName": "workflow-design",
+    "title": "Workflow Design",
+    "description": "Define strategy, prompts, targeting, and workflow shape before building tables or running enrichments.",
+    "toolNames": [
+      "brainstorm_play",
+      "claygent_prompts",
+      "design_clay",
+      "generate_icp",
+      "get_play_catalog",
+      "write_outreach"
+    ]
+  },
+  {
+    "dirName": "table-operations",
+    "title": "Table Operations",
+    "description": "Build, inspect, run, document, and export tables, rows, and enrichment workflows.",
+    "toolNames": [
+      "clay_add_rows",
+      "clay_audit_table",
+      "clay_build_table",
+      "clay_build_webhook_table",
+      "clay_document_table",
+      "clay_export_data",
+      "clay_get_schema",
+      "clay_list_tables",
+      "clay_run_enrichments"
+    ]
+  },
+  {
+    "dirName": "provider-research",
+    "title": "Provider Research",
+    "description": "Compare providers, integrations, and capability tradeoffs before choosing a workflow.",
+    "toolNames": [
+      "ask_clay",
+      "compare_providers",
+      "find_integrations"
+    ]
+  },
+  {
+    "dirName": "account-and-usage",
+    "title": "Account and Usage",
+    "description": "Check pricing, usage, limits, credits, and upgrade context for the current account.",
+    "toolNames": [
+      "clay_get_credits",
+      "get_pricing",
+      "get_tool_costs",
+      "get_usage"
+    ]
+  }
+]
