@@ -31,9 +31,12 @@ to produce a concern-first doc folder.
 
 ## Output shape
 
-See `docs/brainstorms/clay-document-skill.md` for the full design, including
-the concern-first organizing principle, detected-pattern list, 4-phase build
-plan, and MCP backend asks.
+Concern-first folder (not table-first). One file per concern — README,
+overview (client-facing), build (architecture + WHY), prompts (every AI
+prompt centralized), copy (templated outbound text), sources, destinations,
+audit, cost, rebuild, reference, CHANGELOG — plus per-table summaries under
+`tables/` and per-workbook summaries under `workbooks/` (folder/multi-URL
+mode only). Full orchestration logic lives in `SKILL.md`.
 
 ## Test workbooks
 

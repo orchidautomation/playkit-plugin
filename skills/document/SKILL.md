@@ -9,10 +9,6 @@ Produce a complete, client-ready documentation scaffold for a Clay workflow
 in one command. Concern-first, not table-first. Always-latest folder structure.
 Preserves human-edited `<!-- WHY: -->` and `<!-- KEEP: -->` blocks on regen.
 
-## Design spec
-Full design at [`docs/brainstorms/clay-document-skill.md`](../../../docs/brainstorms/clay-document-skill.md).
-If anything below is ambiguous, read the spec.
-
 ## Invocation
 
 `/document $ARGUMENTS` — $ARGUMENTS contains one or more Clay URLs and optional flags.
