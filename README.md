@@ -91,29 +91,123 @@ pluxx install --trust --target claude-code   # or cursor / codex / opencode, or 
 
 ## Persisting your API key
 
-The export-in-shell approach works but gets lost across sessions. Three durable options:
+A plain `export PLAYKIT_API_KEY=…` only lives for the current shell. Persist it once and every editor, terminal, and install script on your machine picks it up automatically.
 
-**1. `~/.zshrc` / `~/.bashrc`**
+### macOS (zsh — default since Catalina)
+
+macOS Catalina and later default to zsh. `~/.zshrc` loads on every interactive shell.
 
 ```bash
+# Append the export to your shell profile
+echo 'export PLAYKIT_API_KEY="PK_LIVE_…"' >> ~/.zshrc
+
+# Reload the profile in the current shell
+source ~/.zshrc
+
+# Verify it's set
+echo $PLAYKIT_API_KEY
+```
+
+Not sure which shell you're on? Run `echo $SHELL`. If it says `/bin/zsh`, use `~/.zshrc`. If `/bin/bash`, use `~/.bash_profile` (macOS) or `~/.bashrc` (Linux).
+
+> **GUI apps on macOS don't read `~/.zshrc`.** If you launch Cursor, VS Code, or Claude Desktop from Finder/Spotlight, the env var won't be visible. Two fixes:
+> - **Launch the editor from the terminal** (`cursor .`, `code .`) — it inherits the shell env.
+> - **Or set it machine-wide** with `launchctl` so GUI apps see it too:
+>   ```bash
+>   launchctl setenv PLAYKIT_API_KEY "PK_LIVE_…"
+>   ```
+>   Add that line to `~/.zshrc` so it re-runs every login. `launchctl setenv` persists until the next reboot unless you wire up a `LaunchAgent` plist — for most people, reloading on shell startup is enough.
+
+### Linux (bash/zsh)
+
+```bash
+# bash (default on most distros)
+echo 'export PLAYKIT_API_KEY="PK_LIVE_…"' >> ~/.bashrc
+source ~/.bashrc
+
+# zsh
 echo 'export PLAYKIT_API_KEY="PK_LIVE_…"' >> ~/.zshrc
 source ~/.zshrc
 ```
 
-**2. `.env.local` at repo root (for local dev / testing this plugin itself)**
+For system-wide (all users), root can write to `/etc/environment`:
+
+```bash
+echo 'PLAYKIT_API_KEY=PK_LIVE_…' | sudo tee -a /etc/environment
+```
+
+Log out and back in for `/etc/environment` to take effect.
+
+### Windows — PowerShell (recommended)
+
+The cleanest way. This sets a user-level env var that persists across reboots and is visible to every app (Cursor, VS Code, Claude Desktop, WSL, etc.).
+
+```powershell
+# Set it permanently for your user
+[System.Environment]::SetEnvironmentVariable('PLAYKIT_API_KEY', 'PK_LIVE_…', 'User')
+
+# Make it available in the current session too
+$env:PLAYKIT_API_KEY = 'PK_LIVE_…'
+
+# Verify
+echo $env:PLAYKIT_API_KEY
+```
+
+Close and reopen your terminal (and any running editors) to pick up the new value.
+
+To persist it across every future PowerShell session without re-setting, add this to your PowerShell profile:
+
+```powershell
+# Open your profile (creates it if it doesn't exist)
+if (!(Test-Path -Path $PROFILE)) { New-Item -ItemType File -Path $PROFILE -Force }
+notepad $PROFILE
+
+# Add this line and save:
+$env:PLAYKIT_API_KEY = [System.Environment]::GetEnvironmentVariable('PLAYKIT_API_KEY', 'User')
+```
+
+### Windows — Command Prompt (`setx`)
+
+```cmd
+setx PLAYKIT_API_KEY "PK_LIVE_…"
+```
+
+`setx` writes to the user registry. The value is available in **new** terminals only — close and reopen CMD to see it. Verify with `echo %PLAYKIT_API_KEY%`.
+
+### Windows — GUI (for non-terminal users)
+
+1. Start → search "Environment Variables" → "Edit environment variables for your account"
+2. Under **User variables**, click **New**
+3. Variable name: `PLAYKIT_API_KEY`
+4. Variable value: your `PK_LIVE_…` key
+5. OK → OK → restart Cursor / VS Code / Claude Desktop
+
+### Windows — WSL (Ubuntu etc.)
+
+WSL is Linux, so use the Linux bash instructions above inside the WSL shell. WSL does **not** inherit Windows env vars by default — set it separately in `~/.bashrc` inside WSL.
+
+### Project-local override (`.env.local`)
+
+For local plugin development or one-off testing, put the key in a repo-local `.env` file instead of global env:
 
 ```bash
 cd playkit-plugin
 echo 'PLAYKIT_API_KEY=PK_LIVE_…' > .env.local
 ```
 
-`.env*` is already gitignored.
+`.env*` is already gitignored. Pluxx and most AI tooling will pick it up automatically.
 
-**3. 1Password CLI / `op run`**
+### 1Password CLI (avoid plaintext on disk)
 
 ```bash
 op run --env-file=./.env.op -- pluxx install --trust
 ```
+
+Your `.env.op` references 1Password items instead of raw values — nothing sensitive lands on disk.
+
+### Confirm the editor actually sees the key
+
+After persisting, **fully quit and relaunch** Cursor / VS Code / Claude Desktop (menu → Quit, not just close the window) so it inherits the new env. Then in the plugin's installed runner, the `sessionStart` hook (`scripts/check-env.sh`) will fail loudly if `PLAYKIT_API_KEY` is missing.
 
 ## Verify install
 
