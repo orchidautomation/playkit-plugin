@@ -1,4 +1,4 @@
-# /document skill
+# /clay-doc skill
 
 Claude Code skill that generates a client-ready documentation scaffold for
 any Clay workflow. Orchestrates PlayKit MCP tools to pull live schemas,
@@ -8,10 +8,10 @@ to produce a concern-first doc folder.
 ## Invocation
 
 ```
-/document <clay-url>
-/document <url1> <url2> ... --pipeline-name my-pipeline
-/document <url> --for client
-/document <url> --commit
+/clay-doc <clay-url>
+/clay-doc <url1> <url2> ... --pipeline-name my-pipeline
+/clay-doc <url> --for client
+/clay-doc <url> --commit
 ```
 
 ## Input modes
@@ -25,7 +25,7 @@ to produce a concern-first doc folder.
 
 ## Files in this skill
 
-- `SKILL.md` — orchestration logic Claude follows when `/document` is invoked
+- `SKILL.md` — orchestration logic Claude follows when `/clay-doc` is invoked
 - `templates/*.md` — output skeletons with `{{placeholder}}` and `<!-- SECTION: -->` markers
 - This `README.md` — quick orientation
 
@@ -48,6 +48,6 @@ Both live in Rillet workspace (477473).
 
 ## Regeneration safety
 
-Rerun `/document <url>` any time. Human-edited `<!-- WHY: -->` and
+Rerun `/clay-doc <url>` any time. Human-edited `<!-- WHY: -->` and
 `<!-- KEEP: -->` blocks are preserved across regenerations. Drift is logged
 to `CHANGELOG.md`.

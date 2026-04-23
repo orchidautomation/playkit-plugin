@@ -1,9 +1,9 @@
 ---
-name: document
-description: "Generate client-ready documentation for a Clay workflow. Invoke with /document plus a Clay URL (table, workbook, folder, or multiple). Orchestrates PlayKit MCP tools into a concern-first doc folder: prompts, copy, sources, destinations, audit, cost."
+name: clay-doc
+description: "Generate client-ready documentation for a Clay workflow. Invoke with /clay-doc plus a Clay URL (table, workbook, folder, or multiple). Orchestrates PlayKit MCP tools into a concern-first doc folder: prompts, copy, sources, destinations, audit, cost."
 ---
 
-# /document — Clay Workflow Documentation Orchestrator
+# /clay-doc — Clay Workflow Documentation Orchestrator
 
 Produce a complete, client-ready documentation scaffold for a Clay workflow
 in one command. Concern-first, not table-first. Always-latest folder structure.
@@ -11,7 +11,7 @@ Preserves human-edited `<!-- WHY: -->` and `<!-- KEEP: -->` blocks on regen.
 
 ## Invocation
 
-`/document $ARGUMENTS` — $ARGUMENTS contains one or more Clay URLs and optional flags.
+`/clay-doc $ARGUMENTS` — $ARGUMENTS contains one or more Clay URLs and optional flags.
 
 ## Step 1 — Verify connection
 
@@ -147,7 +147,7 @@ If `<!-- WHY: -->` block exists in existing file but not in the new template sec
 
 ## Step 9 — Write files from templates
 
-Read each template from `.claude/skills/document/templates/<name>.md`, fill placeholders, and write:
+Read each template from `.claude/skills/clay-doc/templates/<name>.md`, fill placeholders, and write:
 
 | Template        | Output filename                        | Write when              |
 |-----------------|----------------------------------------|-------------------------|
