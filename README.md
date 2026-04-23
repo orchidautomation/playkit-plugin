@@ -21,65 +21,47 @@ PlayKit is a knowledge base + tool surface for designing, building, and document
 
 ## Install
 
-You need a PlayKit API key first: **[playkit.sh → Settings → API Keys](https://playkit.sh)**. Export it before installing so the installer can wire it into your editor:
+**Step 1 — Get your API key** from [playkit.sh → Settings → API Keys](https://playkit.sh) and export it:
 
 ```bash
 export PLAYKIT_API_KEY="PK_LIVE_…"
 ```
 
-Then pick your runner:
+**Step 2 — Pick your installer.** All installers pull the latest release tarball from GitHub and wire it into your editor.
 
-### Option A — Install from source (all runners)
-
-```bash
-git clone https://github.com/orchidautomation/playkit-plugin.git
-cd playkit-plugin
-npm install -g @orchid-labs/pluxx   # one-time, if you don't have Pluxx
-pluxx install --trust --target claude-code      # or cursor / codex / opencode
-```
-
-`--trust` is needed because the plugin declares a `sessionStart` hook that verifies your API key is exported. Review `scripts/check-env.sh` if you want to see what it does before trusting it.
-
-To install for every supported runner in one shot:
+### Quick install (one-liner, all runners)
 
 ```bash
-pluxx install --trust
+export PLAYKIT_API_KEY="PK_LIVE_…"
+curl -fsSL https://github.com/orchidautomation/playkit-plugin/releases/latest/download/install-all.sh | bash
 ```
 
-### Option B — Per-runner quick install
+### Per-runner quick install
 
 **Claude Code**
 
 ```bash
 export PLAYKIT_API_KEY="PK_LIVE_…"
-git clone https://github.com/orchidautomation/playkit-plugin.git
-cd playkit-plugin
-pluxx install --trust --target claude-code
+curl -fsSL https://github.com/orchidautomation/playkit-plugin/releases/latest/download/install-claude-code.sh | bash
 # then in Claude Code: /reload-plugins
 ```
 
-Installs to: `claude plugin install playkit@pluxx-local-playkit`
-Config: Claude Code reads `PLAYKIT_API_KEY` from your shell env.
+Installs to: `~/.claude/plugins/data/playkit-releases/plugins/playkit/`
 
 **Cursor**
 
 ```bash
 export PLAYKIT_API_KEY="PK_LIVE_…"
-git clone https://github.com/orchidautomation/playkit-plugin.git
-cd playkit-plugin
-pluxx install --trust --target cursor
+curl -fsSL https://github.com/orchidautomation/playkit-plugin/releases/latest/download/install-cursor.sh | bash
 ```
 
 Installs to: `~/.cursor/plugins/local/playkit/`
-Cursor picks up `PLAYKIT_API_KEY` from the env your editor inherits on launch.
 
 **OpenCode**
 
 ```bash
 export PLAYKIT_API_KEY="PK_LIVE_…"
-git clone https://github.com/orchidautomation/playkit-plugin.git
-cd playkit-plugin
-pluxx install --trust --target opencode
+curl -fsSL https://github.com/orchidautomation/playkit-plugin/releases/latest/download/install-opencode.sh | bash
 ```
 
 Installs to: `~/.config/opencode/plugins/playkit.ts`
@@ -88,14 +70,24 @@ Installs to: `~/.config/opencode/plugins/playkit.ts`
 
 ```bash
 export PLAYKIT_API_KEY="PK_LIVE_…"
-git clone https://github.com/orchidautomation/playkit-plugin.git
-cd playkit-plugin
-pluxx install --trust --target codex
+curl -fsSL https://github.com/orchidautomation/playkit-plugin/releases/latest/download/install-codex.sh | bash
 ```
 
-Installs to: `~/.codex/plugins/playkit/` (registered via `~/.agents/plugins/marketplace.json`)
+Installs to: `~/.codex/plugins/playkit/`
 
-If you want Codex hooks, copy the generated `.codex/hooks.generated.json` into `~/.codex/hooks.json` and enable `codex_hooks = true` in your Codex config.
+If you want Codex hooks, grab the `.codex/hooks.generated.json` emitted at install time, copy it into `~/.codex/hooks.json`, and enable `codex_hooks = true` in your Codex config.
+
+### Install from source (development)
+
+```bash
+export PLAYKIT_API_KEY="PK_LIVE_…"
+git clone https://github.com/orchidautomation/playkit-plugin.git
+cd playkit-plugin
+npm install -g @orchid-labs/pluxx   # one-time, if you don't have Pluxx
+pluxx install --trust --target claude-code   # or cursor / codex / opencode, or omit for all
+```
+
+`--trust` is needed because the plugin declares a `sessionStart` hook that verifies your API key is exported. Review `scripts/check-env.sh` before trusting.
 
 ## Persisting your API key
 
