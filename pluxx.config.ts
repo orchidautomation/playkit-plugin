@@ -2,7 +2,7 @@ import { definePlugin } from 'pluxx'
 
 export default definePlugin({
   name: "playkit",
-  version: '0.1.0',
+  version: '0.1.1',
   description: "PlayKit plugin scaffold for setup and auth and workflow design workflows.",
   author: {
     name: "Orchid Labs",
