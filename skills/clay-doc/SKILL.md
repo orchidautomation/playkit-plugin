@@ -70,7 +70,11 @@ For each table, in parallel:
 - `mcp__playkit__clay_document_table(table_id, "full")`
 - `mcp__playkit__clay_audit_table(table_id, workspace_id=<id>, depth="deep")`
 
-**If `clay_get_schema` returns a file-path** (token overflow):
+`clay_get_schema` returns top-level `prompts` and up to 5 `sample_rows` by default. Use those fields as the source of truth for AI prompt bodies and row examples before falling back to raw `typeSettings` traversal.
+
+If the response includes `auto_compacted: true`, continue normally: the full top-level `prompts` and `sample_rows` are preserved even though non-essential `typeSettings` fields were compacted.
+
+**If `clay_get_schema` still returns a file-path or explicit truncation marker**:
 - Note the file path
 - Use `Read` with chunked offsets to extract only what you need (AI prompts, HTTP bodies, conditional-run formulas, waterfall formulas, source-column references)
 - Save the raw file copy to `<output_path>/_raw/<table_id>.schema.json`
@@ -82,6 +86,10 @@ For each table, in parallel:
 From `columns[]`: `id`, `name`, `type`, `typeSettings.dataTypeSettings.type`, `typeSettings.formulaText` (full, not truncated), `typeSettings.formulaType`.
 
 ### AI action prompts
+Prefer top-level `prompts[]` from `clay_get_schema` when present:
+- `column_id`, `column_name`, `model`, `prompt`, `answer_schema`, `run_budget`, `conditional_run`
+
+If `prompts[]` is absent, fall back to raw `columns[].typeSettings` extraction:
 Where `type == "action"` and `typeSettings.actionKey == "use-ai"`:
 - **Model:** `inputsBinding[]` entry where `name == "model"` → `formulaText` (strip quotes)
 - **System prompt:** `inputsBinding[]` where `name == "prompt"` → `formulaText` (unescape JSON string literals, unwrap `Clay.formatForAIPrompt(...)` calls to show column refs)
@@ -207,7 +215,8 @@ Summarize to the user:
 - No write actions → skip `destinations.md`
 - No `workspace_id` (table URL alone with no workbook context) → skip `cost.md`
 - Audit call fails → continue; note "audit skipped" in README
-- Schema overflow → best-effort extract + raw file saved + `<!-- TRUNCATED -->` markers
+- Schema auto-compacted → continue using top-level `prompts` + `sample_rows`; note compaction only if reconstruction detail is missing
+- Schema overflow/file-path fallback → best-effort extract + raw file saved + `<!-- TRUNCATED -->` markers
 
 ## Exit criteria
 

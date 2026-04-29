@@ -30,5 +30,5 @@ Workflow:
 ## Custom Notes
 
 <!-- pluxx:custom:start -->
-Add custom guidance, examples, or caveats here. This section is preserved across `pluxx sync --from-mcp`.
+When inspecting a table, start with `clay_get_schema(table_id)`. It includes top-level `prompts` and up to 5 `sample_rows` by default, and may auto-compact oversized schemas while preserving those fields. Call `clay_export_data` only when the user needs additional rows.
 <!-- pluxx:custom:end -->

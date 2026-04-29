@@ -333,5 +333,10 @@ Inputs:
 ## Custom Notes
 
 <!-- pluxx:custom:start -->
-Add custom guidance, examples, or caveats here. This section is preserved across `pluxx sync --from-mcp`.
+### `clay_get_schema` response handling
+
+- For table inspection and documentation, call `clay_get_schema(table_id)` first. The tool now returns top-level `prompts` and up to 5 `sample_rows` by default, so you should use those fields before calling `clay_export_data` or asking the user for another extraction pass.
+- If a table schema is large, `clay_get_schema` may return `auto_compacted: true`. That is expected: compacted `typeSettings` still preserve top-level AI prompt configs and sample rows.
+- Use `compact=true` when the user wants a lighter schema overview. Use the default full mode when you need formulas, action settings, and table reconstruction detail.
+- Only call `clay_export_data(max_rows=...)` when the user explicitly needs more than the included sample rows or asks for row data beyond schema inspection.
 <!-- pluxx:custom:end -->

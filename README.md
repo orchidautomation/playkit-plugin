@@ -225,6 +225,8 @@ In the editor itself:
 
 The headline skill. Hand it any Clay URL and it orchestrates `clay_list_tables` + `clay_get_schema` + `clay_document_table` + `clay_audit_table` in parallel, then writes a concern-first documentation folder:
 
+`clay_get_schema` includes top-level AI `prompts` and up to 5 `sample_rows` by default. Large schemas may auto-compact non-essential `typeSettings`, but prompt bodies and row examples remain available for documentation.
+
 ```
 docs/clay/<workspace>/<scope>/
 ├── README.md              ← navigation
