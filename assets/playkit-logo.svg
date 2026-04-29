@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 180" role="img" aria-labelledby="title desc">
+  <title id="title">PlayKit logo</title>
+  <desc id="desc">PlayKit wordmark with the orange gradient app icon.</desc>
+  <defs>
+    <linearGradient id="playkit-logo-gradient" x1="34" y1="34" x2="146" y2="146" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FF6B35"/>
+      <stop offset="1" stop-color="#FF8F6B"/>
+    </linearGradient>
+  </defs>
+  <rect width="720" height="180" rx="28" fill="#050505"/>
+  <rect x="34" y="34" width="112" height="112" rx="22" fill="url(#playkit-logo-gradient)"/>
+  <path d="M74 62L116 90L74 118V62Z" fill="#FFFFFF" opacity="0.95"/>
+  <path d="M92 70L128 90L92 110V70Z" fill="#FFFFFF" opacity="0.5"/>
+  <text x="178" y="88" fill="#FFFFFF" font-family="JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, monospace" font-size="48" font-weight="700">PlayKit</text>
+  <text x="180" y="124" fill="#A1A1AA" font-family="JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" font-weight="500">Clay expertise for every AI editor</text>
+</svg>

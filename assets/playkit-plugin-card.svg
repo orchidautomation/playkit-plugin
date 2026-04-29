@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">PlayKit plugin preview</title>
+  <desc id="desc">Dark PlayKit brand preview showing Clay workflow outcomes.</desc>
+  <defs>
+    <linearGradient id="playkit-card-gradient" x1="96" y1="104" x2="248" y2="256" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FF6B35"/>
+      <stop offset="1" stop-color="#FF8F6B"/>
+    </linearGradient>
+    <linearGradient id="playkit-card-line" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#FF6B35"/>
+      <stop offset="0.52" stop-color="#00D4FF"/>
+      <stop offset="1" stop-color="#00FF88"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="#050505"/>
+  <rect x="80" y="80" width="1040" height="515" rx="28" fill="#111111" stroke="#2A2A2A" stroke-width="2"/>
+  <rect x="96" y="104" width="152" height="152" rx="30" fill="url(#playkit-card-gradient)"/>
+  <path d="M150 146L208 180L150 214V146Z" fill="#FFFFFF" opacity="0.95"/>
+  <path d="M174 158L224 180L174 202V158Z" fill="#FFFFFF" opacity="0.5"/>
+  <text x="288" y="154" fill="#FFFFFF" font-family="JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, monospace" font-size="56" font-weight="700">PlayKit</text>
+  <text x="288" y="207" fill="#A1A1AA" font-family="JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, monospace" font-size="26" font-weight="500">Clay expertise for your AI editor</text>
+  <rect x="288" y="250" width="652" height="6" rx="3" fill="url(#playkit-card-line)"/>
+  <g font-family="JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, monospace" font-size="28" font-weight="600">
+    <text x="112" y="360" fill="#FFFFFF">Design credit-aware workflows</text>
+    <text x="112" y="424" fill="#FFFFFF">Build and inspect Clay tables</text>
+    <text x="112" y="488" fill="#FFFFFF">Audit providers, schemas, and prompts</text>
+    <text x="112" y="552" fill="#FFFFFF">Generate client-ready documentation</text>
+  </g>
+  <g fill="none" stroke-linecap="round" stroke-width="6">
+    <path d="M74 348L88 362L112 334" stroke="#00FF88"/>
+    <path d="M74 412L88 426L112 398" stroke="#00FF88"/>
+    <path d="M74 476L88 490L112 462" stroke="#00FF88"/>
+    <path d="M74 540L88 554L112 526" stroke="#00FF88"/>
+  </g>
+  <rect x="790" y="344" width="260" height="70" rx="16" fill="#171717" stroke="#303030"/>
+  <text x="818" y="389" fill="#FFBD2E" font-family="JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, monospace" font-size="24" font-weight="700">60-90% savings</text>
+  <rect x="790" y="440" width="260" height="70" rx="16" fill="#171717" stroke="#303030"/>
+  <text x="818" y="485" fill="#00D4FF" font-family="JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, monospace" font-size="24" font-weight="700">215 integrations</text>
+</svg>

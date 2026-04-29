@@ -1,8 +1,8 @@
 # PlayKit Plugin
 
-**Use PlayKit from Claude Code, Cursor, Codex, or OpenCode.**
+**Clay expertise for Claude Code, Cursor, Codex, and OpenCode.**
 
-This plugin helps you design, build, audit, and document Clay workflows from your AI editor. It adds practical commands for common Clay work, including workflow design, table builds, provider research, and client-ready documentation.
+PlayKit helps your AI editor design Clay workflows, build tables, audit workbooks, compare providers, and generate client-ready docs without leaving your workspace.
 
 ## What's inside
 

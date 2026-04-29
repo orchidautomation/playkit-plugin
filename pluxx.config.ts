@@ -1,18 +1,33 @@
 import { definePlugin } from 'pluxx'
 
+const PLAYKIT_ICON = "./assets/playkit-icon.svg"
+const PLAYKIT_LOGO = "./assets/playkit-logo.svg"
+const PLAYKIT_SCREENSHOT = "./assets/playkit-plugin-card.svg"
+
 export default definePlugin({
   name: "playkit",
-  version: '0.1.1',
-  description: "PlayKit plugin scaffold for setup and auth and workflow design workflows.",
+  version: '0.1.2',
+  description: "Clay expertise for your AI editor: design workflows, build tables, audit workbooks, and generate client-ready docs with PlayKit.",
   author: {
     name: "Orchid Labs",
+    url: "https://orchidautomation.com",
   },
   license: 'MIT',
+  repository: "https://github.com/orchidautomation/playkit-plugin",
+  keywords: [
+    "clay",
+    "gtm",
+    "mcp",
+    "playkit",
+    "sales-automation",
+    "workflow-automation"
+  ],
 
   skills: './skills/',
   commands: "./commands/",
 
   instructions: './INSTRUCTIONS.md',
+  assets: "./assets/",
 
   userConfig: [
     {
@@ -54,7 +69,19 @@ export default definePlugin({
 
   brand: {
     displayName: "PlayKit",
-    shortDescription: "PlayKit plugin scaffold for setup and auth and workflow design workflows."
+    shortDescription: "Clay expertise for your AI editor.",
+    longDescription: "PlayKit turns AI editors into Clay workflow partners: brainstorm GTM plays, compare providers, design credit-aware architectures, build tables, audit workbooks, and generate client-ready docs.",
+    category: "Productivity",
+    color: "#FF6B35",
+    icon: PLAYKIT_ICON,
+    logo: PLAYKIT_LOGO,
+    screenshots: [PLAYKIT_SCREENSHOT],
+    defaultPrompts: [
+      "Design a Clay workflow for a high-volume outbound campaign.",
+      "Audit this Clay workbook and find credit, provider, and schema risks.",
+      "Generate client-ready documentation for this Clay table."
+    ],
+    websiteURL: "https://playkit.sh"
   },
 
   targets: ["claude-code", "opencode", "codex", "cursor"],

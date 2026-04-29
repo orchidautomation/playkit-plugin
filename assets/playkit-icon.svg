@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">PlayKit icon</title>
+  <desc id="desc">Orange gradient app icon with two white play shapes.</desc>
+  <defs>
+    <linearGradient id="playkit-icon-gradient" x1="0" y1="0" x2="256" y2="256" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FF6B35"/>
+      <stop offset="1" stop-color="#FF8F6B"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="48" fill="url(#playkit-icon-gradient)"/>
+  <path d="M80 64L176 128L80 192V64Z" fill="#FFFFFF" opacity="0.95"/>
+  <path d="M112 80L192 128L112 176V80Z" fill="#FFFFFF" opacity="0.5"/>
+</svg>
