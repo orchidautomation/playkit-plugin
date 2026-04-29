@@ -1,8 +1,8 @@
 # PlayKit Plugin
 
-**A Clay GTM engineering co-pilot for Claude Code, Cursor, Codex, and OpenCode — powered by the [PlayKit](https://playkit.sh) MCP.**
+**Use PlayKit from Claude Code, Cursor, Codex, or OpenCode.**
 
-PlayKit is a knowledge base + tool surface for designing, building, and documenting Clay workflows. This plugin wraps the PlayKit MCP as a set of workflow-driven slash commands so your AI editor can brainstorm plays, design multi-table architectures, build tables end-to-end, audit production workbooks, and hand clients a polished documentation folder — all without leaving your terminal.
+This plugin helps you design, build, audit, and document Clay workflows from your AI editor. It adds practical commands for common Clay work, including workflow design, table builds, provider research, and client-ready documentation.
 
 ## What's inside
 
