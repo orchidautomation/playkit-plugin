@@ -1,10 +1,13 @@
 ---
-description: "Build, inspect, run, document, and export tables, rows, and enrichment workflows."
-argument-hint: "[id] [rows-json]"
+description: "Build, inspect, patch, run, document, and export Clay tables, rows, columns, sources, and enrichment workflows."
+when_to_use: "Use this command when the user asks to build, inspect, patch, run, document, or export Clay tables, rows, columns, sources, and enrichment workflows."
+argument-hint: [id] [rows-json|updates-json]
+arguments: ["id","rows-json|updates-json"]
+skill: "table-operations"
 ---
 
 <!-- pluxx:generated:start -->
-Use this command when the user asks to build, inspect, run, document, and export tables, rows, and enrichment workflows.
+Use this command when the user asks to build, inspect, patch, run, document, and export Clay tables, rows, columns, sources, and enrichment workflows.
 
 Arguments: $ARGUMENTS
 
@@ -18,6 +21,8 @@ Primary tools:
 - `clay_get_schema`
 - `clay_list_tables`
 - `clay_run_enrichments`
+- `clay_update_column`
+- `clay_update_source`
 
 Workflow:
 
@@ -30,5 +35,5 @@ Workflow:
 ## Custom Notes
 
 <!-- pluxx:custom:start -->
-When inspecting a table, start with `clay_get_schema(table_id)`. It includes top-level `prompts` and up to 5 `sample_rows` by default, and may auto-compact oversized schemas while preserving those fields. Call `clay_export_data` only when the user needs additional rows.
+When inspecting a table, start with `clay_get_schema(table_id)`. It includes top-level `prompts`, up to 5 `sample_rows`, source/search config, source columns, and normalized view details by default. Use `clay_update_column` for prompt/formula/action binding/conditional-run edits and `clay_update_source` for Find People/Find Companies source filter changes; call `clay_export_data` only when the user needs additional rows.
 <!-- pluxx:custom:end -->

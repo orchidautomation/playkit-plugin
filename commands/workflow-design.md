@@ -1,6 +1,9 @@
 ---
 description: "Define strategy, prompts, targeting, and workflow shape before building tables or running enrichments."
-argument-hint: "[use-case] [task]"
+when_to_use: "Use this command when the user asks to work on define strategy, prompts, targeting, and workflow shape before building tables or running enrichments."
+argument-hint: [use-case] [task]
+arguments: ["use-case","task"]
+skill: "workflow-design"
 ---
 
 <!-- pluxx:generated:start -->
@@ -27,5 +30,5 @@ Workflow:
 ## Custom Notes
 
 <!-- pluxx:custom:start -->
-Add custom guidance, examples, or caveats here. This section is preserved across `pluxx sync --from-mcp`.
+For build-ready designs, ask `design_clay` for `output_format="build_spec"` and pass its `tables` wrapper directly to `clay_build_table`. Use native Clay waterfall formula columns for fallback output merges instead of modeling the final waterfall as an action column.
 <!-- pluxx:custom:end -->

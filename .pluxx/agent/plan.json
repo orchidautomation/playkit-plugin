@@ -12,7 +12,7 @@
   },
   "mcp": {
     "metadataPath": ".pluxx/mcp.json",
-    "toolCount": 24,
+    "toolCount": 26,
     "serverName": "clay-knowledge",
     "transport": "http",
     "auth": "header via X-API-Key from PLAYKIT_API_KEY"
@@ -144,7 +144,14 @@
     "Only Pluxx-managed sections are modified."
   ],
   "caveats": [
-    "[warning] codex-hooks-external-config: Codex plugin docs currently separate hook configuration from plugin packaging, so Pluxx emits hook guidance as external Codex config rather than as a plugin-bundled hook surface. Pluxx will generate `.codex/hooks.generated.json` as a mirror, but you still need to copy or adapt it into `~/.codex/hooks.json` or `<repo>/.codex/hooks.json` and enable `codex_hooks = true` in Codex itself.",
+    "[warning] codex-command-translation: Command fields \"when_to_use\", \"argument-hint\", \"arguments\", \"skill\", \"skills\" are not native Codex plugin slash-command fields today. Codex does not currently document plugin-packaged slash-command parity. Pluxx keeps canonical command intent through AGENTS.md routing guidance and `.codex/commands.generated.json`.",
+    "[warning] codex-command-translation: Command fields \"argument-hint\", \"skill\", \"skills\" are not native Codex plugin slash-command fields today. Codex does not currently document plugin-packaged slash-command parity. Pluxx keeps canonical command intent through AGENTS.md routing guidance and `.codex/commands.generated.json`.",
+    "[warning] codex-command-translation: Command fields \"when_to_use\", \"argument-hint\", \"arguments\", \"skill\", \"skills\" are not native Codex plugin slash-command fields today. Codex does not currently document plugin-packaged slash-command parity. Pluxx keeps canonical command intent through AGENTS.md routing guidance and `.codex/commands.generated.json`.",
+    "[warning] codex-command-translation: Command fields \"when_to_use\", \"argument-hint\", \"arguments\", \"skill\", \"skills\" are not native Codex plugin slash-command fields today. Codex does not currently document plugin-packaged slash-command parity. Pluxx keeps canonical command intent through AGENTS.md routing guidance and `.codex/commands.generated.json`.",
+    "[warning] codex-command-translation: Command fields \"when_to_use\", \"argument-hint\", \"arguments\", \"skill\", \"skills\" are not native Codex plugin slash-command fields today. Codex does not currently document plugin-packaged slash-command parity. Pluxx keeps canonical command intent through AGENTS.md routing guidance and `.codex/commands.generated.json`.",
+    "[warning] codex-command-translation: Command fields \"when_to_use\", \"argument-hint\", \"arguments\", \"skill\", \"skills\" are not native Codex plugin slash-command fields today. Codex does not currently document plugin-packaged slash-command parity. Pluxx keeps canonical command intent through AGENTS.md routing guidance and `.codex/commands.generated.json`.",
+    "[warning] codex-commands-routing-guidance: Codex does not currently document plugin-packaged slash-command parity. Pluxx keeps canonical command intent through AGENTS.md routing guidance and `.codex/commands.generated.json`. Pluxx will degrade commands into skills plus those routing surfaces today.",
+    "[warning] codex-hooks-external-config: Pluxx now bundles Codex hooks at `hooks/hooks.json`, and Codex plugin-bundled hook loading requires `plugin_hooks = true` under `[features]`. The general `hooks` flag covers non-plugin hook config and defaults on; `codex_hooks` is deprecated and should not be treated as a plugin-bundled hook fallback. If bundled hooks do not activate, enable `plugin_hooks = true`, reload Codex, and retest in a trusted interactive session.",
     "[warning] primitive-degrade-summary: On codex, these active compiler buckets will compile to weaker native equivalents: commands.",
     "[warning] primitive-translate-summary: On opencode, these active compiler buckets will be re-expressed through different native surfaces: hooks.",
     "[warning] primitive-translate-summary: On codex, these active compiler buckets will be re-expressed through different native surfaces: hooks."

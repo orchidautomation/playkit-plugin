@@ -6,8 +6,8 @@ const PLAYKIT_SCREENSHOT = "./assets/playkit-plugin-card.svg"
 
 export default definePlugin({
   name: "playkit",
-  version: '0.1.2',
-  description: "Clay expertise for your AI editor: design workflows, build tables, audit workbooks, and generate client-ready docs with PlayKit.",
+  version: '0.1.3',
+  description: "Clay expertise for your AI editor: design workflows, build and patch tables, audit workbooks, and generate client-ready docs with PlayKit.",
   author: {
     name: "Orchid Labs",
     url: "https://orchidautomation.com",
@@ -70,7 +70,7 @@ export default definePlugin({
   brand: {
     displayName: "PlayKit",
     shortDescription: "Clay expertise for your AI editor.",
-    longDescription: "PlayKit turns AI editors into Clay workflow partners: brainstorm GTM plays, compare providers, design credit-aware architectures, build tables, audit workbooks, and generate client-ready docs.",
+    longDescription: "PlayKit turns AI editors into Clay workflow partners: brainstorm GTM plays, compare providers, design credit-aware architectures, build and patch tables, audit workbooks, and generate client-ready docs.",
     category: "Productivity",
     color: "#FF6B35",
     icon: PLAYKIT_ICON,
@@ -78,7 +78,7 @@ export default definePlugin({
     screenshots: [PLAYKIT_SCREENSHOT],
     defaultPrompts: [
       "Design a Clay workflow for a high-volume outbound campaign.",
-      "Audit this Clay workbook and find credit, provider, and schema risks.",
+      "Patch this Clay source filter or AI prompt without rebuilding the table.",
       "Generate client-ready documentation for this Clay table."
     ],
     websiteURL: "https://playkit.sh"

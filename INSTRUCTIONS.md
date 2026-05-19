@@ -1,7 +1,7 @@
 <!-- pluxx:generated:start -->
 # PlayKit
 
-PlayKit plugin scaffold for setup and auth and workflow design workflows.
+Clay expertise for your AI editor: design workflows, build tables, audit workbooks, patch live Clay tables, and generate client-ready docs with PlayKit.
 
 PlayKit connects to its MCP over HTTP. Export `PLAYKIT_API_KEY` so Pluxx can send X-API-Key.
 
@@ -9,7 +9,7 @@ PlayKit connects to its MCP over HTTP. Export `PLAYKIT_API_KEY` so Pluxx can sen
 
 - `setup-and-auth`: Confirm access, auth state, and session readiness before running operational workflows. Primary tools: `clay_connect`, `clay_status`.
 - `workflow-design`: Define strategy, prompts, targeting, and workflow shape before building tables or running enrichments. Primary tools: `brainstorm_play`, `claygent_prompts`, `design_clay`, `generate_icp`, `get_play_catalog`, `write_outreach`.
-- `table-operations`: Build, inspect, run, document, and export tables, rows, and enrichment workflows. Primary tools: `clay_add_rows`, `clay_audit_table`, `clay_build_table`, `clay_build_webhook_table`, `clay_document_table`, `clay_export_data`, `clay_get_schema`, `clay_list_tables`, `clay_run_enrichments`.
+- `table-operations`: Build, inspect, patch, run, document, and export tables, rows, columns, sources, and enrichment workflows. Primary tools: `clay_add_rows`, `clay_audit_table`, `clay_build_table`, `clay_build_webhook_table`, `clay_document_table`, `clay_export_data`, `clay_get_schema`, `clay_list_tables`, `clay_run_enrichments`, `clay_update_column`, `clay_update_source`.
 - `provider-research`: Compare providers, integrations, and capability tradeoffs before choosing a workflow. Primary tools: `ask_clay`, `compare_providers`, `find_integrations`.
 - `account-and-usage`: Check pricing, usage, limits, credits, and upgrade context for the current account. Primary tools: `clay_get_credits`, `get_pricing`, `get_tool_costs`, `get_usage`.
 
@@ -21,9 +21,11 @@ PlayKit connects to its MCP over HTTP. Export `PLAYKIT_API_KEY` so Pluxx can sen
 - `clay_connect`: Connect to Clay by providing your session cookie.
 - `clay_status`: Check Clay API connection status.
 - `clay_list_tables`: Browse Clay tables in a workspace or workbook.
-- `clay_get_schema`: Get the full schema of a Clay table (columns, types, enrichments, formulas).
-- `clay_add_rows`: Add rows to a Clay table.
+- `clay_get_schema`: Get table schema, prompts, sample rows, source/search config, source columns, and view details.
+- `clay_add_rows`: Add rows to a Clay table using column names or field IDs.
 - `clay_run_enrichments`: Run an enrichment column on records in a Clay table.
+- `clay_update_column`: Update an existing Clay column's configuration.
+- `clay_update_source`: Update a Clay source configuration, including Find People/Find Companies filters.
 - `clay_export_data`: Export row data from a Clay table as JSON.
 - `clay_get_credits`: Get Clay credit usage report for a workspace.
 - `ask_clay`: Ask any question about Clay.
@@ -35,8 +37,8 @@ PlayKit connects to its MCP over HTTP. Export `PLAYKIT_API_KEY` so Pluxx can sen
 - `design_clay`: Design a complete Clay workflow — from single tables to multi-table architectures.
 - `write_outreach`: Generate personalized outreach copy using Clay enrichment data.
 - `generate_icp`: Generate an Ideal Customer Profile (ICP) for a company.
-- `clay_build_table`: Build a complete Clay table from a spec — including action/enrichment columns.
-- `clay_build_webhook_table`: Create a Clay table with a webhook source and optionally seed it with rows.
+- `clay_build_table`: Build one or more Clay tables from a spec, including native waterfall formula columns and action/enrichment columns.
+- `clay_build_webhook_table`: Create a Clay table with a webhook source and optionally seed it through the table API.
 - `clay_audit_table`: Audit a Clay table and recommend optimizations.
 - `clay_document_table`: Generate beautiful, shareable documentation of a Clay table.
 

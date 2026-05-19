@@ -1,6 +1,9 @@
 ---
 description: "Compare providers, integrations, and capability tradeoffs before choosing a workflow."
-argument-hint: "[question] [use-case]"
+when_to_use: "Use this command when the user asks to compare providers, integrations, and capability tradeoffs before choosing a workflow."
+argument-hint: [question] [use-case]
+arguments: ["question","use-case"]
+skill: "provider-research"
 ---
 
 <!-- pluxx:generated:start -->

@@ -1,33 +1,33 @@
 ---
 name: "table-operations"
-description: "Build, inspect, run, document, and export tables, rows, and enrichment workflows."
+description: "Build, inspect, patch, run, document, and export tables, rows, columns, sources, and enrichment workflows."
 ---
 
 <!-- pluxx:generated:start -->
 # Table Operations
 
-Build, inspect, run, document, and export tables, rows, and enrichment workflows.
+Build, inspect, patch, run, document, and export tables, rows, columns, sources, and enrichment workflows.
 
 ## Tools In This Skill
 
 ### `clay_add_rows`
 
 
-        Add rows to a Clay table.
+Add rows to a Clay table.
 
-        Automatically detects webhook-sourced tables and routes data through
-        the webhook URL (using column names as keys). For non-webhook tables,
-        uses the direct API (requires column field IDs from clay_get_schema).
+Accepts either column names or Clay field IDs as keys. Webhook-sourced
+tables still return their webhook URL for external systems, but this
+tool writes through Clay's records API so the table columns populate.
 
-        Args:
-            table_id: The table ID (e.g., "t_abc123").
-            rows_json: JSON string — either a single object or an array of objects.
-                For webhook tables: use column names as keys (e.g., {"Company": "Acme"}).
-                For regular tables: use field IDs as keys (e.g., {"f_abc123": "Acme"}).
+Args:
+    table_id: The table ID (e.g., "t_abc123").
+    rows_json: JSON string — either a single object or an array of objects.
+        Use column names (e.g., {"Company": "Acme"}) or field IDs
+        (e.g., {"f_abc123": "Acme"}).
 
-        Returns:
-            Confirmation with number of rows added and method used (webhook or api).
-        
+Returns:
+    Confirmation with number of rows added and method used.
+
 
 Inputs:
 - `table_id` (string, required)
@@ -36,32 +36,32 @@ Inputs:
 ### `clay_audit_table`
 
 
-        Audit a Clay table and recommend optimizations. PlayKit-exclusive.
+Audit a Clay table and recommend optimizations. PlayKit-exclusive.
 
-        Performs deep analysis of column architecture, enrichment strategy, cost
-        efficiency, AI tool selection, waterfall patterns, and anti-patterns.
-        Returns a scored audit with actionable recommendations.
+Performs deep analysis of column architecture, enrichment strategy, cost
+efficiency, AI tool selection, waterfall patterns, and anti-patterns.
+Returns a scored audit with actionable recommendations.
 
-        Uses PlayKit's full methodology: integration graph (215 providers),
-        knowledge base (1,834+ docs), skills (29 vertical/horizontal), and
-        building blocks catalog.
+Uses PlayKit's full methodology: integration graph (215 providers),
+knowledge base (1,834+ docs), skills (29 vertical/horizontal), and
+building blocks catalog.
 
-        Args:
-            table_id: A table ID (t_abc123), workbook ID (wb_xyz), or full Clay URL.
-            workspace_id: Optional workspace ID. If provided, includes actual credit
-                usage data in the audit. Get from clay_list_tables.
-            depth: "quick" — fast programmatic checks only (no LLM, <5s).
-                "deep" (default) — full audit with agent analysis, strategic
-                recommendations, and knowledge base cross-reference (~15-30s).
-            response_format: "markdown" (default) preserves the historical tool
-                contract. Use "json" to return a structured payload with the
-                markdown report in `result` and parsed credit usage in
-                `credit_usage`.
+Args:
+    table_id: A table ID (t_abc123), workbook ID (wb_xyz), or full Clay URL.
+    workspace_id: Optional workspace ID. If provided, includes actual credit
+        usage data in the audit. Get from clay_list_tables.
+    depth: "quick" — fast programmatic checks only (no LLM, <5s).
+        "deep" (default) — full audit with agent analysis, strategic
+        recommendations, and knowledge base cross-reference (~15-30s).
+    response_format: "markdown" (default) preserves the historical tool
+        contract. Use "json" to return a structured payload with the
+        markdown report in `result` and parsed credit usage in
+        `credit_usage`.
 
-        Returns:
-            Markdown audit report by default, or a JSON envelope when
-            response_format="json".
-        
+Returns:
+    Markdown audit report by default, or a JSON envelope when
+    response_format="json".
+
 
 Inputs:
 - `table_id` (string, required)
@@ -72,41 +72,50 @@ Inputs:
 ### `clay_build_table`
 
 
-        Build a complete Clay table from a spec — including action/enrichment columns.
+Build a complete Clay table from a spec — including action/enrichment columns.
 
-        This is the final step in the brainstorm → design → build loop.
-        Takes a build spec JSON (from design_clay or hand-crafted) and creates
-        everything in Clay via API: workbook, table, input columns, formulas,
-        and action columns (enrichments, AI actions, waterfalls) with full
-        input bindings and conditional run logic.
+This is the final step in the brainstorm → design → build loop.
+Takes a build spec JSON (from design_clay or hand-crafted) and creates
+everything in Clay via API: workbook, table, input columns, formulas,
+and action columns (enrichments, AI actions, waterfalls) with full
+input bindings and conditional run logic.
 
-        Args:
-            workspace_id: The numeric workspace ID.
-            table_spec_json: JSON object with table_name and columns array. Each column:
-                - name: Column name (required)
-                - type: text, url, number, formula, action, etc. (required)
-                - formula: Formula text using {{Column Name}} refs (for type=formula)
-                - actionKey: Enrichment slug (for type=action), e.g. "enrich-company-with-mixrank-v2"
-                - actionVersion: Action version, default 1 (for type=action)
-                - actionPackageId: Package UUID (for type=action, optional)
-                - inputsBinding: List of {"name": ..., "formulaText": ...} (for type=action)
-                - conditionalRunFormulaText: When to run (for type=action, optional)
+Args:
+    workspace_id: The numeric workspace ID.
+    table_spec_json: JSON object with either a direct table_name +
+        columns array, or design_clay's {"tables": [...]} wrapper.
+        Each column:
+        - name: Column name (required)
+        - type: text, url, number, formula, action, etc. (required)
+        - formula: Formula text using {{Column Name}} refs (for type=formula)
+        - formulaType: "waterfall" plus formulaWaterfall for native
+          Clay waterfall formula columns. Example:
+          {"name": "Work Email", "type": "formula", "formulaType": "waterfall",
+           "waterfallType": "person/workEmail", "dataType": "email",
+           "truncateValue": true,
+           "formulaWaterfall": [{"formula": "{{Find Work Email}}?.email"},
+                                {"formula": "{{Find Work Email (2)}}?.email"}]}
+        - actionKey: Enrichment slug (for type=action), e.g. "enrich-company-with-mixrank-v2"
+        - actionVersion: Action version, default 1 (for type=action)
+        - actionPackageId: Package UUID (for type=action, optional)
+        - inputsBinding: List of {"name": ..., "formulaText": ...} (for type=action)
+        - conditionalRunFormulaText: When to run (for type=action, optional)
 
-                Example:
-                {
-                    "table_name": "My Table",
-                    "columns": [
-                        {"name": "Domain", "type": "text"},
-                        {"name": "Enrich", "type": "action", "actionKey": "enrich-company-with-mixrank-v2",
-                         "inputsBinding": [{"name": "company_identifier", "formulaText": "{{Domain}}"}]},
-                        {"name": "Industry", "type": "formula", "formula": "{{Enrich}}?.industry"}
-                    ]
-                }
-            workbook_name: Optional workbook name. Defaults to table_name.
+        Example:
+        {
+            "table_name": "My Table",
+            "columns": [
+                {"name": "Domain", "type": "text"},
+                {"name": "Enrich", "type": "action", "actionKey": "enrich-company-with-mixrank-v2",
+                 "inputsBinding": [{"name": "company_identifier", "formulaText": "{{Domain}}"}]},
+                {"name": "Industry", "type": "formula", "formula": "{{Enrich}}?.industry"}
+            ]
+        }
+    workbook_name: Optional workbook name. Defaults to table_name.
 
-        Returns:
-            JSON with table URL, columns created/failed, and field ID mapping.
-        
+Returns:
+    JSON with table URL, columns created/failed, and field ID mapping.
+
 
 Inputs:
 - `workspace_id` (integer, required)
@@ -116,53 +125,54 @@ Inputs:
 ### `clay_build_webhook_table`
 
 
-        Create a Clay table with a webhook source and optionally seed it with rows.
+Create a Clay table with a webhook source and optionally seed it with rows.
 
-        One call does everything: creates a workbook, table, columns (with full
-        dependency resolution), attaches a webhook source, retrieves the webhook URL,
-        and optionally populates initial rows. The returned webhook URL can be used
-        to programmatically POST data to Clay from any external system.
+One call does everything: creates a workbook, table, columns (with full
+dependency resolution), attaches a webhook source, retrieves the webhook URL,
+and optionally populates initial rows. The returned webhook URL can be used
+to programmatically POST data to Clay from any external system.
 
-        Args:
-            workspace_id: The numeric workspace ID.
-            table_spec_json: JSON object with table_name and columns array.
-                Same format as clay_build_table — supports text, url, number,
-                formula, action columns with full dependency resolution.
+Args:
+    workspace_id: The numeric workspace ID.
+    table_spec_json: JSON object with table_name and columns array.
+        Same format as clay_build_table — supports text, url, number,
+        formula, native formula waterfall, and action columns with full
+        dependency resolution.
 
-                Example:
-                {
-                    "table_name": "Inbound Leads",
-                    "columns": [
-                        {"name": "Company", "type": "text"},
-                        {"name": "Domain", "type": "url"},
-                        {"name": "Contact Email", "type": "text"},
-                        {"name": "Source", "type": "text"},
-                        {"name": "Enrich Company", "type": "action",
-                         "actionKey": "enrich-company-with-mixrank-v2",
-                         "inputsBinding": [{"name": "company_identifier", "formulaText": "{{Domain}}"}]}
-                    ]
-                }
-            webhook_name: Display name for the webhook source (default: "Webhook").
-            seed_rows_json: Optional JSON array of row objects to insert after table
-                creation. Keys are column names (not field IDs — auto-translated).
+        Example:
+        {
+            "table_name": "Inbound Leads",
+            "columns": [
+                {"name": "Company", "type": "text"},
+                {"name": "Domain", "type": "url"},
+                {"name": "Contact Email", "type": "text"},
+                {"name": "Source", "type": "text"},
+                {"name": "Enrich Company", "type": "action",
+                 "actionKey": "enrich-company-with-mixrank-v2",
+                 "inputsBinding": [{"name": "company_identifier", "formulaText": "{{Domain}}"}]}
+            ]
+        }
+    webhook_name: Display name for the webhook source (default: "Webhook").
+    seed_rows_json: Optional JSON array of row objects to insert after table
+        creation. Keys are column names (not field IDs — auto-translated).
 
-                Example:
-                [
-                    {"Company": "Acme Corp", "Domain": "acme.com", "Contact Email": "jane@acme.com"},
-                    {"Company": "Globex", "Domain": "globex.com", "Contact Email": "bob@globex.com"}
-                ]
-            workbook_name: Optional workbook name. Defaults to table_name.
+        Example:
+        [
+            {"Company": "Acme Corp", "Domain": "acme.com", "Contact Email": "jane@acme.com"},
+            {"Company": "Globex", "Domain": "globex.com", "Contact Email": "bob@globex.com"}
+        ]
+    workbook_name: Optional workbook name. Defaults to table_name.
 
-        Returns:
-            JSON with table URL, webhook URL, curl example, columns created,
-            seed row status, and the 50K submission limit warning.
+Returns:
+    JSON with table URL, webhook URL, curl example, columns created,
+    seed row status, and the 50K submission limit warning.
 
-        Notes:
-            - Webhook URLs have a 50,000 submission lifetime limit on standard plans.
-            - Bursts >100 events/minute will queue.
-            - Seed rows count toward the 50K limit.
-            - Enterprise plans can enable auto-delete for unlimited submissions.
-        
+Notes:
+    - Webhook URLs have a 50,000 submission lifetime limit on standard plans.
+    - Bursts >100 events/minute will queue.
+    - External webhook submissions count toward the 50K limit.
+    - Enterprise plans can enable auto-delete for unlimited submissions.
+
 
 Inputs:
 - `workspace_id` (integer, required)
@@ -174,25 +184,25 @@ Inputs:
 ### `clay_document_table`
 
 
-        Generate beautiful, shareable documentation of a Clay table.
+Generate beautiful, shareable documentation of a Clay table.
 
-        Creates a complete document with ASCII-art diagrams showing the table's
-        column architecture, data flow, enrichment chains, waterfall patterns,
-        and conditional logic. Designed for git tracking and client sharing.
+Creates a complete document with ASCII-art diagrams showing the table's
+column architecture, data flow, enrichment chains, waterfall patterns,
+and conditional logic. Designed for git tracking and client sharing.
 
-        Args:
-            table_id: A table ID (t_abc123), workbook ID (wb_xyz), or full Clay URL.
-            output_format: "full" (default) — complete doc with all sections and diagrams.
-                "compact" — shorter version with column table + flow diagram only.
-            response_format: "markdown" (default) preserves the historical tool
-                contract. Use "json" to return a structured payload with the
-                rendered markdown in `result` and parsed documentation data in
-                `data`.
+Args:
+    table_id: A table ID (t_abc123), workbook ID (wb_xyz), or full Clay URL.
+    output_format: "full" (default) — complete doc with all sections and diagrams.
+        "compact" — shorter version with column table + flow diagram only.
+    response_format: "markdown" (default) preserves the historical tool
+        contract. Use "json" to return a structured payload with the
+        rendered markdown in `result` and parsed documentation data in
+        `data`.
 
-        Returns:
-            Markdown documentation by default, or a JSON envelope when
-            response_format="json".
-        
+Returns:
+    Markdown documentation by default, or a JSON envelope when
+    response_format="json".
+
 
 Inputs:
 - `table_id` (string, required)
@@ -202,21 +212,21 @@ Inputs:
 ### `clay_export_data`
 
 
-        Export row data from a Clay table as JSON.
+Export row data from a Clay table as JSON.
 
-        Fetches all (or limited) rows with human-readable column names.
-        Returns a summary with sample rows and full data.
+Fetches all (or limited) rows with human-readable column names.
+Returns a summary with sample rows and full data.
 
-        Args:
-            table_id: A table ID (t_abc123), workbook ID (wb_xyz), or full Clay URL.
-                If a workbook ID or URL is passed, resolves to the first table and exports its data.
-            max_rows: Maximum number of rows to export. Omit for all rows.
-            columns: Optional comma-separated column names to include.
-                Example: "Company Name, Email, LinkedIn URL"
+Args:
+    table_id: A table ID (t_abc123), workbook ID (wb_xyz), or full Clay URL.
+        If a workbook ID or URL is passed, resolves to the first table and exports its data.
+    max_rows: Maximum number of rows to export. Omit for all rows.
+    columns: Optional comma-separated column names to include.
+        Example: "Company Name, Email, LinkedIn URL"
 
-        Returns:
-            JSON with table info, column list, sample rows, and full data array.
-        
+Returns:
+    JSON with table info, column list, sample rows, and full data array.
+
 
 Inputs:
 - `table_id` (string, required)
@@ -226,60 +236,73 @@ Inputs:
 ### `clay_get_schema`
 
 
-        Get the full schema of a Clay table (columns, types, enrichments, formulas).
+Get the full schema of a Clay table (columns, types, enrichments, formulas).
 
-        Returns complete table metadata including all fields/columns with their
-        types, enrichment configurations, formula definitions, and view information.
+Returns complete table metadata including all fields/columns with their
+types, enrichment configurations, formula definitions, source/search
+configurations, and view information.
 
-        Args:
-            table_id: A table ID (t_abc123), workbook ID (wb_xyz), or full Clay URL.
-                If a workbook ID or URL is passed, resolves to table(s) inside it.
-            compact: When True, removes non-essential typeSettings fields to reduce
-                payload size and avoid tool output overflow on large tables.
+Args:
+    table_id: A table ID (t_abc123), workbook ID (wb_xyz), or full Clay URL.
+        If a workbook ID or URL is passed, resolves to table(s) inside it.
+    compact: When True, removes non-essential typeSettings fields to reduce
+        payload size and avoid tool output overflow on large tables.
+    include_prompts: When True, extracts AI action prompts into a top-level
+        `prompts` array so prompt bodies are easy to access.
+    include_sample_rows: When True, includes up to sample_row_limit rows from
+        the first view with data.
+    include_sources: When True, fetches source metadata separately from
+        Clay's source endpoint so Find Companies/Find People filters and
+        source search config are visible when Clay exposes them.
+    sample_row_limit: Number of sample rows to include when enabled. Capped at 5.
 
-        Returns:
-            JSON table schema with columns, types, sources, and views.
-        
+Returns:
+    JSON table schema with columns, types, sources, views, prompts, and sample rows.
+
 
 Inputs:
 - `table_id` (string, required)
 - `compact` (boolean)
+- `include_prompts` (boolean)
+- `include_sample_rows` (boolean)
+- `include_sources` (boolean)
+- `sample_row_limit` (integer)
 
 ### `clay_list_tables`
 
 
-        Browse Clay tables in a workspace or workbook. Accepts any Clay URL.
+Browse Clay tables in a workspace or workbook. Accepts any Clay URL.
 
-        Just paste a Clay URL and this tool figures out what to show you:
-        - Folder URL → lists all workbooks/tables in that folder (recursive)
-        - Workbook URL → lists all tables in the workbook
-        - Table URL → returns the table's column schema
-        - Workspace URL → lists all resources (tables, workbooks, folders)
+Just paste a Clay URL and this tool figures out what to show you:
+- Folder URL → lists all workbooks/tables in that folder (recursive)
+- Workbook URL → lists all tables in the workbook
+- Table URL → returns the table's column schema
+- Workspace URL → lists all resources (tables, workbooks, folders)
 
-        Next steps after listing tables:
-        - To read a table's schema: clay_get_schema(table_id)
-        - To audit a table for optimizations: clay_audit_table(table_id)
-        - To document a table with ASCII diagrams: clay_document_table(table_id)
-        - To export data from a table: clay_export_data(table_id)
+Next steps after listing tables:
+- To read a table's schema: clay_get_schema(table_id)
+- To audit a table for optimizations: clay_audit_table(table_id)
+- To document a table with ASCII diagrams: clay_document_table(table_id)
+- To export data from a table: clay_export_data(table_id)
 
-        Args:
-            workspace_id: The numeric workspace ID. Omit to list available workspaces.
-            search: Optional search query to filter resources by name.
-            url: Optional Clay URL. Supports:
-                - Workbook URL: https://app.clay.com/workspaces/123/workbooks/wb_abc/...
-                  → lists all tables in that workbook
-                - Folder URL: https://app.clay.com/workspaces/123/folders/f_abc/...
-                  → lists all workbooks/tables under that folder (recursive)
-                - Workspace URL: https://app.clay.com/workspaces/123/...
-                  → lists all resources in that workspace
-                - Table URL: https://app.clay.com/workspaces/123/workbooks/wb_abc/tables/t_xyz
-                  → returns that table's info directly
-            include_archived: Include archived folders/workbooks/tables in results.
-                Default is False (archived resources are excluded).
+Args:
+    workspace_id: The numeric workspace ID. Omit to list available workspaces.
+    search: Optional search query to filter resources by name.
+    url: Optional Clay URL. Supports:
+        - Workbook URL: https://app.clay.com/workspaces/123/workbooks/wb_abc/...
+          → lists all tables in that workbook
+        - Folder URL: https://app.clay.com/workspaces/123/folders/f_abc/...
+          → lists all workbooks/tables under that folder (recursive)
+        - Workspace URL: https://app.clay.com/workspaces/123/...
+          → lists all resources in that workspace
+        - Table URL: https://app.clay.com/workspaces/123/workbooks/wb_abc/tables/t_xyz
+          → returns that table's info directly
+    include_archived: Include archived folders/workbooks/tables in results.
+        Default is False (archived resources are excluded).
 
-        Returns:
-            JSON list of tables/resources.
-        
+Returns:
+    JSON list of tables/resources.
+
 
 Inputs:
 - `workspace_id` (unknown)
@@ -290,26 +313,91 @@ Inputs:
 ### `clay_run_enrichments`
 
 
-        Run an enrichment column on records in a Clay table.
+Run an enrichment column on records in a Clay table.
 
-        Triggers an enrichment provider to run on records in a specific view.
-        Use clay_get_schema to find field IDs and view IDs.
+Triggers an enrichment provider to run on records in a specific view.
+Use clay_get_schema to find field IDs and view IDs.
 
-        Args:
-            table_id: The table ID.
-            view_id: The view ID (e.g., "gv_xxx"). Records in this view will be enriched.
-            field_id: The enrichment column/field ID to run.
-            num_records: Optional limit on number of records to enrich. Omit for all.
+Args:
+    table_id: The table ID.
+    view_id: The view ID (e.g., "gv_xxx"). Records in this view will be enriched.
+    field_id: The enrichment column/field ID to run.
+    num_records: Optional limit on number of records to enrich. Omit for all.
 
-        Returns:
-            Enrichment run confirmation.
-        
+Returns:
+    Enrichment run confirmation.
+
 
 Inputs:
 - `table_id` (string, required)
 - `view_id` (string, required)
 - `field_id` (string, required)
 - `num_records` (unknown)
+
+### `clay_update_column`
+
+
+Update an existing Clay column's configuration.
+
+Use this to edit formulas, action input bindings, conditional runs,
+names, descriptions, and other field settings without rebuilding the
+table. Formula-bearing update values can use human-readable
+{{Column Name}} references; PlayKit resolves them to Clay field IDs.
+
+Args:
+    table_id: A table ID (t_abc123), workbook/table URL, or other
+        value accepted by clay_get_schema. Must resolve to one table.
+    column: Column field ID (f_abc123) or exact column name.
+    updates_json: JSON object with top-level field updates. You can
+        provide either {"typeSettings": {...}} or ergonomic top-level
+        type settings like {"inputsBinding": [...],
+        "conditionalRunFormulaText": "..."}.
+    resolve_references: When true, replace known {{Column Name}}
+        references in formulaText, formula,
+        formulaWaterfall[].formula, and conditionalRunFormulaText
+        values with {{field_id}} refs.
+
+Returns:
+    JSON summary of the updated column and any Clay settings errors.
+
+
+Inputs:
+- `table_id` (string, required)
+- `column` (string, required)
+- `updates_json` (string, required)
+- `resolve_references` (boolean)
+
+### `clay_update_source`
+
+
+Update a Clay source configuration, including Find People/Find Companies filters.
+
+Use clay_get_schema(table_id, include_sources=True) first, then pass the
+source ID, source name, source column ID, or source column name. If the
+table has exactly one source, `source` may be omitted.
+
+Args:
+    table_id: A table ID (t_abc123), workbook/table URL, or other
+        value accepted by clay_get_schema. Must resolve to one table.
+    updates_json: JSON object with source updates. Mirror the nested
+        source config returned by clay_get_schema, for example:
+        {"state": {"filters": {"country": ["United States"]}}}
+        or {"typeSettings": {"filters": {...}}}.
+    source: Source ID/name or source column ID/name. Optional only when
+        the table has exactly one source.
+    merge_existing: When true, deep-merge nested dicts with the current
+        source before PATCHing so partial filter updates preserve other
+        source settings.
+
+Returns:
+    JSON summary of the updated source and Clay's response.
+
+
+Inputs:
+- `table_id` (string, required)
+- `updates_json` (string, required)
+- `source` (unknown)
+- `merge_existing` (boolean)
 
 ## Example Requests
 
@@ -322,6 +410,8 @@ Inputs:
 - "Find clay get schemas using <table_id>."
 - "Find clay list tables."
 - "Find clay run enrichments using <table_id>."
+- "Find clay update columns using <table_id> and <column>."
+- "Find clay update sources using <table_id> and <updates_json>."
 
 ## Usage
 
@@ -335,8 +425,19 @@ Inputs:
 <!-- pluxx:custom:start -->
 ### `clay_get_schema` response handling
 
-- For table inspection and documentation, call `clay_get_schema(table_id)` first. The tool now returns top-level `prompts` and up to 5 `sample_rows` by default, so you should use those fields before calling `clay_export_data` or asking the user for another extraction pass.
-- If a table schema is large, `clay_get_schema` may return `auto_compacted: true`. That is expected: compacted `typeSettings` still preserve top-level AI prompt configs and sample rows.
+- For table inspection and documentation, call `clay_get_schema(table_id)` first. The tool returns top-level `prompts`, up to 5 `sample_rows`, `source_columns`, source/search config, and normalized view details by default, so use those fields before calling `clay_export_data` or asking the user for another extraction pass.
+- If a table schema is large, `clay_get_schema` may return `auto_compacted: true`. That is expected: compacted `typeSettings` still preserve top-level AI prompt configs, source metadata, and sample rows.
 - Use `compact=true` when the user wants a lighter schema overview. Use the default full mode when you need formulas, action settings, and table reconstruction detail.
 - Only call `clay_export_data(max_rows=...)` when the user explicitly needs more than the included sample rows or asks for row data beyond schema inspection.
+
+### Patching existing tables
+
+- Before `clay_update_column`, inspect the table with `clay_get_schema(table_id)` and use the exact column name or field ID. Prefer small `updates_json` patches over rebuilding a table when the user asks to change a prompt, formula, input binding, conditional run, description, or native waterfall config.
+- `clay_update_column` resolves `{{Column Name}}` references in `formulaText`, `formula`, `formulaWaterfall[].formula`, and `conditionalRunFormulaText` by default. Keep `resolve_references=true` unless the user intentionally provides Clay field IDs.
+- Before `clay_update_source`, inspect with `clay_get_schema(table_id, include_sources=true)`. Patch the returned nested source shape and leave `merge_existing=true` for partial filter/config edits so existing source settings are not dropped.
+
+### Build and row semantics
+
+- `clay_build_table` accepts both a direct single-table spec and `design_clay`'s `{"tables": [...]}` wrapper. Use native Clay waterfalls as formula columns with `formulaType="waterfall"`, `waterfallType`, optional `truncateValue`, and `formulaWaterfall`.
+- `clay_add_rows` now accepts either human column names or field IDs. Webhook-sourced tables return their webhook URL for external systems, but inserted rows go through Clay's records API so created columns populate.
 <!-- pluxx:custom:end -->

@@ -24,7 +24,7 @@
   {
     "dirName": "table-operations",
     "title": "Table Operations",
-    "description": "Build, inspect, run, document, and export tables, rows, and enrichment workflows.",
+    "description": "Build, inspect, patch, run, document, and export tables, rows, columns, sources, and enrichment workflows.",
     "toolNames": [
       "clay_add_rows",
       "clay_audit_table",
@@ -34,7 +34,9 @@
       "clay_export_data",
       "clay_get_schema",
       "clay_list_tables",
-      "clay_run_enrichments"
+      "clay_run_enrichments",
+      "clay_update_column",
+      "clay_update_source"
     ]
   },
   {

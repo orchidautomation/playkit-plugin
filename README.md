@@ -2,17 +2,17 @@
 
 **Clay expertise for Claude Code, Cursor, Codex, and OpenCode.**
 
-PlayKit helps your AI editor design Clay workflows, build tables, audit workbooks, compare providers, and generate client-ready docs without leaving your workspace.
+PlayKit helps your AI editor design Clay workflows, build tables, patch existing columns and source filters, audit workbooks, compare providers, and generate client-ready docs without leaving your workspace.
 
 ## What's inside
 
-**6 skills · 6 slash commands · 24 MCP tools**
+**6 skills · 6 slash commands · 26 MCP tools**
 
 | Command | What it does |
 |---|---|
 | `/clay-doc <clay-url>` | **Document a Clay workflow.** Generates a client-ready `docs/clay/…` folder (overview, build, prompts, copy, sources, destinations, audit, cost, rebuild, reference + per-table summaries). Concern-first, regen-safe. |
 | `/workflow-design` | Brainstorm plays, design workflows, generate ICPs, write outreach, craft Claygent prompts. |
-| `/table-operations` | Build tables, add rows, run enrichments, audit, export, inspect schemas. |
+| `/table-operations` | Build tables, add rows, patch columns/source filters, run enrichments, audit, export, inspect schemas. |
 | `/provider-research` | Compare providers, find integrations, ask any Clay question. |
 | `/account-and-usage` | Check pricing, credits, tool costs, usage. |
 | `/setup-and-auth` | Connect your Clay session cookie + confirm connection. |
@@ -75,7 +75,7 @@ curl -fsSL https://github.com/orchidautomation/playkit-plugin/releases/latest/do
 
 Installs to: `~/.codex/plugins/playkit/`
 
-If you want Codex hooks, grab the `.codex/hooks.generated.json` emitted at install time, copy it into `~/.codex/hooks.json`, and enable `codex_hooks = true` in your Codex config.
+If you want Codex plugin-bundled hooks, enable `plugin_hooks = true` under `[features]` in your Codex config, then reload Codex.
 
 ### Install from source (development)
 
@@ -225,7 +225,9 @@ In the editor itself:
 
 The headline skill. Hand it any Clay URL and it orchestrates `clay_list_tables` + `clay_get_schema` + `clay_document_table` + `clay_audit_table` in parallel, then writes a concern-first documentation folder:
 
-`clay_get_schema` includes top-level AI `prompts` and up to 5 `sample_rows` by default. Large schemas may auto-compact non-essential `typeSettings`, but prompt bodies and row examples remain available for documentation.
+`clay_get_schema` includes top-level AI `prompts`, up to 5 `sample_rows`, source/search config, source columns, and normalized view details by default. Large schemas may auto-compact non-essential `typeSettings`, but prompt bodies, source metadata, and row examples remain available for documentation.
+
+`clay_update_column` and `clay_update_source` let the plugin patch existing Clay tables without a rebuild: prompts, formulas, action input bindings, conditional runs, native waterfall formula steps, and Find People/Find Companies source filters.
 
 ```
 docs/clay/<workspace>/<scope>/
@@ -310,6 +312,6 @@ pluxx dev --target claude-code
 ## Built with
 
 - [Pluxx](https://github.com/orchidautomation/pluxx) — cross-platform plugin SDK (autopilot, build, install)
-- [PlayKit MCP](https://mcp.playkit.sh/mcp) — 24-tool knowledge + Clay API surface
+- [PlayKit MCP](https://mcp.playkit.sh/mcp) — 26-tool knowledge + Clay API surface
 - Author: **Orchid Labs**
 - License: MIT

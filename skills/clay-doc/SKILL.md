@@ -70,20 +70,20 @@ For each table, in parallel:
 - `mcp__playkit__clay_document_table(table_id, "full")`
 - `mcp__playkit__clay_audit_table(table_id, workspace_id=<id>, depth="deep")`
 
-`clay_get_schema` returns top-level `prompts` and up to 5 `sample_rows` by default. Use those fields as the source of truth for AI prompt bodies and row examples before falling back to raw `typeSettings` traversal.
+`clay_get_schema` returns top-level `prompts`, up to 5 `sample_rows`, source/search config, source columns, and normalized view details by default. Use those fields as the source of truth for AI prompt bodies, row examples, Find People/Find Companies filters, and source/view configuration before falling back to raw `typeSettings` traversal.
 
-If the response includes `auto_compacted: true`, continue normally: the full top-level `prompts` and `sample_rows` are preserved even though non-essential `typeSettings` fields were compacted.
+If the response includes `auto_compacted: true`, continue normally: the full top-level `prompts`, `sample_rows`, and source metadata are preserved even though non-essential `typeSettings` fields were compacted.
 
 **If `clay_get_schema` still returns a file-path or explicit truncation marker**:
 - Note the file path
-- Use `Read` with chunked offsets to extract only what you need (AI prompts, HTTP bodies, conditional-run formulas, waterfall formulas, source-column references)
+- Use `Read` with chunked offsets to extract only what you need (AI prompts, HTTP bodies, conditional-run formulas, native waterfall formulas, source/search config, view filters, source-column references)
 - Save the raw file copy to `<output_path>/_raw/<table_id>.schema.json`
 - Mark affected sections with `<!-- TRUNCATED: see _raw/<table_id>.schema.json -->`
 
 ## Step 5 — Extract structured data per table
 
 ### Columns
-From `columns[]`: `id`, `name`, `type`, `typeSettings.dataTypeSettings.type`, `typeSettings.formulaText` (full, not truncated), `typeSettings.formulaType`.
+From `columns[]`: `id`, `name`, `type`, `typeSettings.dataTypeSettings.type`, `typeSettings.formulaText` (full, not truncated), `typeSettings.formulaType`, `typeSettings.formulaWaterfall`, `typeSettings.waterfallType`.
 
 ### AI action prompts
 Prefer top-level `prompts[]` from `clay_get_schema` when present:
@@ -107,8 +107,13 @@ Where `typeSettings.actionKey == "http-api-v2"`:
 ### Waterfall formulas
 Where `typeSettings.formulaType == "waterfall"` — list the `formulaWaterfall[]` in preferred-fallback order.
 
-### Source columns
-Where `type == "source"` → `sourceIds`, `taggedSourceType`.
+### Sources and views
+Prefer top-level `source_columns[]`, `sources[]`, and `views[]` from `clay_get_schema` when present:
+- `source_columns[]` → source column IDs/names, `source_ids`, `can_create_records`
+- `sources[]` → source ID/name/type plus redacted source/search/filter config
+- `views[]` → view IDs/names plus filters, sorts, visible/hidden field IDs, and column order when Clay exposes them
+
+If these top-level arrays are absent, fall back to columns where `type == "source"` → `sourceIds`, `taggedSourceType`.
 
 ### Parent-joins
 Formulas matching `{{f_...}}?.parent?.<field>` pattern.
@@ -216,6 +221,7 @@ Summarize to the user:
 - No `workspace_id` (table URL alone with no workbook context) → skip `cost.md`
 - Audit call fails → continue; note "audit skipped" in README
 - Schema auto-compacted → continue using top-level `prompts` + `sample_rows`; note compaction only if reconstruction detail is missing
+- Source metadata unavailable → document source columns and note "source config unavailable" in `sources.md` instead of blocking the whole documentation run
 - Schema overflow/file-path fallback → best-effort extract + raw file saved + `<!-- TRUNCATED -->` markers
 
 ## Exit criteria

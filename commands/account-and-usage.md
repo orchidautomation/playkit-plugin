@@ -1,6 +1,9 @@
 ---
 description: "Check pricing, usage, limits, credits, and upgrade context for the current account."
-argument-hint: "[id] [start-date]"
+when_to_use: "Use this command when the user asks to check pricing, usage, limits, credits, and upgrade context for the current account."
+argument-hint: [id] [start-date]
+arguments: ["id","start-date"]
+skill: "account-and-usage"
 ---
 
 <!-- pluxx:generated:start -->
