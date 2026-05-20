@@ -6,7 +6,7 @@ PlayKit helps your AI editor design Clay workflows, build tables, patch existing
 
 ## What's inside
 
-**6 skills · 6 slash commands · 26 MCP tools**
+**6 skills · 6 slash commands · 29 MCP tools**
 
 | Command | What it does |
 |---|---|
@@ -225,7 +225,7 @@ In the editor itself:
 
 The headline skill. Hand it any Clay URL and it orchestrates `clay_list_tables` + `clay_get_schema` + `clay_document_table` + `clay_audit_table` in parallel, then writes a concern-first documentation folder:
 
-`clay_get_schema` includes top-level AI `prompts`, up to 5 `sample_rows`, source/search config, source columns, and normalized view details by default. Large schemas may auto-compact non-essential `typeSettings`, but prompt bodies, source metadata, and row examples remain available for documentation.
+`clay_get_schema` includes top-level AI `prompts`, up to 5 `sample_rows`, source/search config, source columns, and normalized view details by default. Large schemas may auto-compact non-essential `typeSettings`; with `compact=true` and `include_prompts=false`, prompt bindings are omitted to avoid oversized responses. Use `clay_get_columns` for complete ordered column inventory and `clay_get_column` for one selected column's full formula/action/prompt config.
 
 `clay_update_column` and `clay_update_source` let the plugin patch existing Clay tables without a rebuild: prompts, formulas, action input bindings, conditional runs, native waterfall formula steps, and Find People/Find Companies source filters.
 
@@ -312,6 +312,6 @@ pluxx dev --target claude-code
 ## Built with
 
 - [Pluxx](https://github.com/orchidautomation/pluxx) — cross-platform plugin SDK (autopilot, build, install)
-- [PlayKit MCP](https://mcp.playkit.sh/mcp) — 26-tool knowledge + Clay API surface
+- [PlayKit MCP](https://mcp.playkit.sh/mcp) — 29-tool knowledge + Clay API surface
 - Author: **Orchid Labs**
 - License: MIT

@@ -13,6 +13,6 @@ Arguments: $ARGUMENTS
 2. Treat `$ARGUMENTS` as one or more Clay URLs plus optional flags.
 3. Before calling any Clay API tool, verify the MCP connection with `clay_status`. If not connected, tell the user to run `clay_connect(session_cookie="...")` first and STOP.
 4. Parallelize per-table fetches (`clay_get_schema` + `clay_document_table` + `clay_audit_table`).
-5. Use `clay_get_schema` top-level `prompts`, up to 5 `sample_rows`, source/search config, source columns, and view details before falling back to raw schema traversal or export calls.
+5. Use `clay_get_schema` top-level `prompts`, up to 5 `sample_rows`, source/search config, source columns, and view details before falling back to raw schema traversal or export calls. For large/truncated tables, use `clay_get_columns` for full ordered inventory and `clay_get_column` for the full config/formula/prompt of selected columns.
 6. Preserve any existing `<!-- WHY: -->` and `<!-- KEEP: -->` blocks on regen.
 7. Report scope detected, output path, files written, patterns detected, top audit findings, and 30-day credit burn.

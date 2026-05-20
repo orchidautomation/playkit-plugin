@@ -6,7 +6,7 @@ const PLAYKIT_SCREENSHOT = "./assets/playkit-plugin-card.svg"
 
 export default definePlugin({
   name: "playkit",
-  version: '0.1.3',
+  version: '0.1.4',
   description: "Clay expertise for your AI editor: design workflows, build and patch tables, audit workbooks, and generate client-ready docs with PlayKit.",
   author: {
     name: "Orchid Labs",
