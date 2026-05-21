@@ -70,20 +70,19 @@ For each table, in parallel:
 - `mcp__playkit__clay_document_table(table_id, "full")`
 - `mcp__playkit__clay_audit_table(table_id, workspace_id=<id>, depth="deep")`
 
-`clay_get_schema` returns top-level `prompts`, up to 5 `sample_rows`, source/search config, source columns, and normalized view details by default. Use those fields as the source of truth for AI prompt bodies, row examples, Find People/Find Companies filters, and source/view configuration before falling back to raw `typeSettings` traversal.
+`clay_get_schema` returns top-level `prompts`, up to 5 `sample_rows`, source/search config, source columns, normalized view details, and a complete `columns_summary` inventory when auto-compacted. Use those fields as the source of truth for AI prompt bodies, row examples, Find People/Find Companies filters, and source/view configuration before falling back to raw `typeSettings` traversal.
 
-If the response includes `auto_compacted: true`, continue normally: the full top-level `prompts`, `sample_rows`, and source metadata are preserved even though non-essential `typeSettings` fields were compacted.
+If the response includes `auto_compacted: true`, continue normally: the full top-level `prompts`, `sample_rows`, source metadata, and ordered column inventory are preserved even though non-essential `typeSettings` fields were compacted. For very large tables, call `mcp__playkit__clay_get_columns(table_id)` to confirm the complete configured column list, and call `mcp__playkit__clay_get_column(table_id, column)` for any selected column whose full formula/action/prompt config is needed.
 
 **If `clay_get_schema` still returns a file-path or explicit truncation marker**:
-- Note the file path
-- Use `Read` with chunked offsets to extract only what you need (AI prompts, HTTP bodies, conditional-run formulas, native waterfall formulas, source/search config, view filters, source-column references)
-- Save the raw file copy to `<output_path>/_raw/<table_id>.schema.json`
-- Mark affected sections with `<!-- TRUNCATED: see _raw/<table_id>.schema.json -->`
+- First call `mcp__playkit__clay_get_columns(table_id)` for complete ordered inventory.
+- For selected columns that need exact formulas, prompts, HTTP bodies, conditional-run logic, or native waterfall steps, call `mcp__playkit__clay_get_column(table_id, column)`.
+- If a raw schema file is still needed, note the file path, use `Read` with chunked offsets to extract only the remaining source/search config, view filters, or source-column references, save the raw file copy to `<output_path>/_raw/<table_id>.schema.json`, and mark affected sections with `<!-- TRUNCATED: see _raw/<table_id>.schema.json -->`.
 
 ## Step 5 — Extract structured data per table
 
 ### Columns
-From `columns[]`: `id`, `name`, `type`, `typeSettings.dataTypeSettings.type`, `typeSettings.formulaText` (full, not truncated), `typeSettings.formulaType`, `typeSettings.formulaWaterfall`, `typeSettings.waterfallType`.
+From `columns[]` or `columns_summary[]`: `id`, `name`, `type`, order/index, `typeSettings.dataTypeSettings.type`, `typeSettings.formulaText`, `typeSettings.formulaType`, `typeSettings.formulaWaterfall`, `typeSettings.waterfallType`. When a specific column formula/config is missing or preview-only, fetch it with `clay_get_column(table_id, column)` before documenting it as complete.
 
 ### AI action prompts
 Prefer top-level `prompts[]` from `clay_get_schema` when present:

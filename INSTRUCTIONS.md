@@ -9,7 +9,7 @@ PlayKit connects to its MCP over HTTP. Export `PLAYKIT_API_KEY` so Pluxx can sen
 
 - `setup-and-auth`: Confirm access, auth state, and session readiness before running operational workflows. Primary tools: `clay_connect`, `clay_status`.
 - `workflow-design`: Define strategy, prompts, targeting, and workflow shape before building tables or running enrichments. Primary tools: `brainstorm_play`, `claygent_prompts`, `design_clay`, `generate_icp`, `get_play_catalog`, `write_outreach`.
-- `table-operations`: Build, inspect, patch, run, document, and export tables, rows, columns, sources, and enrichment workflows. Primary tools: `clay_add_rows`, `clay_audit_table`, `clay_build_table`, `clay_build_webhook_table`, `clay_document_table`, `clay_export_data`, `clay_get_schema`, `clay_list_tables`, `clay_run_enrichments`, `clay_update_column`, `clay_update_source`.
+- `table-operations`: Build, inspect, patch, run, document, and export tables, rows, columns, sources, and enrichment workflows. Primary tools: `clay_add_rows`, `clay_audit_table`, `clay_build_table`, `clay_build_webhook_table`, `clay_document_table`, `clay_export_data`, `clay_get_schema`, `clay_get_columns`, `clay_get_column`, `clay_get_view`, `clay_list_tables`, `clay_run_enrichments`, `clay_update_column`, `clay_update_source`.
 - `provider-research`: Compare providers, integrations, and capability tradeoffs before choosing a workflow. Primary tools: `ask_clay`, `compare_providers`, `find_integrations`.
 - `account-and-usage`: Check pricing, usage, limits, credits, and upgrade context for the current account. Primary tools: `clay_get_credits`, `get_pricing`, `get_tool_costs`, `get_usage`.
 
@@ -21,7 +21,10 @@ PlayKit connects to its MCP over HTTP. Export `PLAYKIT_API_KEY` so Pluxx can sen
 - `clay_connect`: Connect to Clay by providing your session cookie.
 - `clay_status`: Check Clay API connection status.
 - `clay_list_tables`: Browse Clay tables in a workspace or workbook.
-- `clay_get_schema`: Get table schema, prompts, sample rows, source/search config, source columns, and view details.
+- `clay_get_schema`: Get table schema, prompts, sample rows, source/search config, source columns, and view details. In compact mode with `include_prompts=false`, prompt bindings are omitted to avoid oversized responses.
+- `clay_get_columns`: List every configured table column in order without huge prompts.
+- `clay_get_column`: Fetch one selected column's full formula/action/prompt configuration.
+- `clay_get_view`: Inspect one view with filters/sorts resolved to column names.
 - `clay_add_rows`: Add rows to a Clay table using column names or field IDs.
 - `clay_run_enrichments`: Run an enrichment column on records in a Clay table.
 - `clay_update_column`: Update an existing Clay column's configuration.

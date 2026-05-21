@@ -247,8 +247,13 @@ Args:
         If a workbook ID or URL is passed, resolves to table(s) inside it.
     compact: When True, removes non-essential typeSettings fields to reduce
         payload size and avoid tool output overflow on large tables.
+        When the default full response auto-compacts, PlayKit also
+        includes a complete `columns_summary` inventory.
     include_prompts: When True, extracts AI action prompts into a top-level
-        `prompts` array so prompt bodies are easy to access.
+        `prompts` array so prompt bodies are easy to access. When False,
+        compact schema mode also omits prompt input bindings from
+        per-column typeSettings; use clay_get_column for a selected
+        column's full prompt/config.
     include_sample_rows: When True, includes up to sample_row_limit rows from
         the first view with data.
     include_sources: When True, fetches source metadata separately from
@@ -267,6 +272,81 @@ Inputs:
 - `include_sample_rows` (boolean)
 - `include_sources` (boolean)
 - `sample_row_limit` (integer)
+
+### `clay_get_columns`
+
+
+List every configured column in a Clay table without returning huge prompts.
+
+This is the safest inventory tool for large tables: it returns the
+complete table-level column list (including columns hidden in views by
+default) with order, IDs, names, types, and lightweight config signals.
+Use clay_get_column for one column's complete formula/action settings.
+
+Args:
+    table_id: A table ID (t_abc123), table URL, or other value accepted
+        by clay_get_schema. Must resolve to one table.
+    include_hidden: When True (default), returns all configured table
+        fields. When False, filters by the first view's visible/hidden
+        field metadata if Clay exposes it.
+    compact: When True, returns only order, id, name, type, and
+        view-visibility metadata. When False, also includes formula text
+        and action/source summary fields, but not full action prompts.
+
+Returns:
+    JSON with table metadata, view IDs/names, and the complete column inventory.
+
+
+Inputs:
+- `table_id` (string, required)
+- `include_hidden` (boolean)
+- `compact` (boolean)
+
+### `clay_get_column`
+
+
+Fetch one Clay column's complete configuration by name or field ID.
+
+Use this when a table is too large for clay_get_schema, or when you need
+the full untruncated formula/action configuration for a selected column:
+formulaText, formula waterfalls, action prompts, input bindings,
+conditional runs, and answer schemas.
+
+Args:
+    table_id: A table ID (t_abc123), table URL, or other value accepted
+        by clay_get_schema. Must resolve to one table.
+    column: Exact column name (case-insensitive fallback) or field ID.
+
+Returns:
+    JSON with table metadata and the selected column's full configuration.
+
+
+Inputs:
+- `table_id` (string, required)
+- `column` (string, required)
+
+### `clay_get_view`
+
+
+Fetch one Clay view with filters/sorts resolved to column names.
+
+Use this to inspect QA/filtering logic without opening the Clay UI.
+The response preserves Clay's original filter/sort structures and adds
+human-readable fieldName/columnName values next to field IDs whenever
+the referenced column exists in the table schema.
+
+Args:
+    table_id: A table ID (t_abc123), table URL, or other value accepted
+        by clay_get_schema. Must resolve to one table.
+    view_id: View ID (gv_...) or exact view name.
+
+Returns:
+    JSON with resolved filters, sorts, hidden/visible columns, and view metadata.
+
+
+Inputs:
+- `table_id` (string, required)
+- `view_id` (string, required)
 
 ### `clay_list_tables`
 
@@ -408,6 +488,9 @@ Inputs:
 - "Find clay document tables using <table_id>."
 - "Find clay export datas using <table_id>."
 - "Find clay get schemas using <table_id>."
+- "Find clay get columns using <table_id>."
+- "Find clay get column using <table_id> and <column>."
+- "Find clay get view using <table_id> and <view_id>."
 - "Find clay list tables."
 - "Find clay run enrichments using <table_id>."
 - "Find clay update columns using <table_id> and <column>."
@@ -426,13 +509,14 @@ Inputs:
 ### `clay_get_schema` response handling
 
 - For table inspection and documentation, call `clay_get_schema(table_id)` first. The tool returns top-level `prompts`, up to 5 `sample_rows`, `source_columns`, source/search config, and normalized view details by default, so use those fields before calling `clay_export_data` or asking the user for another extraction pass.
-- If a table schema is large, `clay_get_schema` may return `auto_compacted: true`. That is expected: compacted `typeSettings` still preserve top-level AI prompt configs, source metadata, and sample rows.
-- Use `compact=true` when the user wants a lighter schema overview. Use the default full mode when you need formulas, action settings, and table reconstruction detail.
+- If a table schema is large, `clay_get_schema` may return `auto_compacted: true`. That is expected: compacted `typeSettings` still preserve top-level AI prompt configs, source metadata, sample rows, and a complete `columns_summary` inventory.
+- Use `compact=true` when the user wants a lighter schema overview. Add `include_prompts=false` to omit prompt bindings from compact per-column `typeSettings` and prevent huge AI prompts from crowding out later columns.
+- Use `clay_get_columns(table_id)` for a complete ordered column inventory without huge prompts, `clay_get_column(table_id, column)` for one selected column's full formula/action/prompt config, and `clay_get_view(table_id, view_id)` for filter/sort QA. Use the default full schema mode when you need broad table reconstruction detail.
 - Only call `clay_export_data(max_rows=...)` when the user explicitly needs more than the included sample rows or asks for row data beyond schema inspection.
 
 ### Patching existing tables
 
-- Before `clay_update_column`, inspect the table with `clay_get_schema(table_id)` and use the exact column name or field ID. Prefer small `updates_json` patches over rebuilding a table when the user asks to change a prompt, formula, input binding, conditional run, description, or native waterfall config.
+- Before `clay_update_column`, inspect the table with `clay_get_schema(table_id)` or, for large tables/specific columns, `clay_get_column(table_id, column)`, and use the exact column name or field ID. Prefer small `updates_json` patches over rebuilding a table when the user asks to change a prompt, formula, input binding, conditional run, description, or native waterfall config.
 - `clay_update_column` resolves `{{Column Name}}` references in `formulaText`, `formula`, `formulaWaterfall[].formula`, and `conditionalRunFormulaText` by default. Keep `resolve_references=true` unless the user intentionally provides Clay field IDs.
 - Before `clay_update_source`, inspect with `clay_get_schema(table_id, include_sources=true)`. Patch the returned nested source shape and leave `merge_existing=true` for partial filter/config edits so existing source settings are not dropped.
 

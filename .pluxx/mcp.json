@@ -227,7 +227,7 @@
     },
     {
       "name": "clay_get_schema",
-      "description": "\nGet the full schema of a Clay table (columns, types, enrichments, formulas).\n\nReturns complete table metadata including all fields/columns with their\ntypes, enrichment configurations, formula definitions, source/search\nconfigurations, and view information.\n\nArgs:\n    table_id: A table ID (t_abc123), workbook ID (wb_xyz), or full Clay URL.\n        If a workbook ID or URL is passed, resolves to table(s) inside it.\n    compact: When True, removes non-essential typeSettings fields to reduce\n        payload size and avoid tool output overflow on large tables.\n    include_prompts: When True, extracts AI action prompts into a top-level\n        `prompts` array so prompt bodies are easy to access.\n    include_sample_rows: When True, includes up to sample_row_limit rows from\n        the first view with data.\n    include_sources: When True, fetches source metadata separately from\n        Clay's source endpoint so Find Companies/Find People filters and\n        source search config are visible when Clay exposes them.\n    sample_row_limit: Number of sample rows to include when enabled. Capped at 5.\n\nReturns:\n    JSON table schema with columns, types, sources, views, prompts, and sample rows.\n",
+      "description": "\nGet the full schema of a Clay table (columns, types, enrichments, formulas).\n\nReturns complete table metadata including all fields/columns with their\ntypes, enrichment configurations, formula definitions, source/search\nconfigurations, and view information.\n\nArgs:\n    table_id: A table ID (t_abc123), workbook ID (wb_xyz), or full Clay URL.\n        If a workbook ID or URL is passed, resolves to table(s) inside it.\n    compact: When True, removes non-essential typeSettings fields to reduce\n        payload size and avoid tool output overflow on large tables.\n        When the default full response auto-compacts, PlayKit also\n        includes a complete `columns_summary` inventory.\n    include_prompts: When True, extracts AI action prompts into a top-level\n        `prompts` array so prompt bodies are easy to access. When False,\n        compact schema mode also omits prompt input bindings from\n        per-column typeSettings; use clay_get_column for a selected\n        column's full prompt/config.\n    include_sample_rows: When True, includes up to sample_row_limit rows from\n        the first view with data.\n    include_sources: When True, fetches source metadata separately from\n        Clay's source endpoint so Find Companies/Find People filters and\n        source search config are visible when Clay exposes them.\n    sample_row_limit: Number of sample rows to include when enabled. Capped at 5.\n\nReturns:\n    JSON table schema with columns, types, sources, views, prompts, and sample rows.\n",
       "inputSchema": {
         "properties": {
           "table_id": {
@@ -277,6 +277,116 @@
           "result"
         ],
         "title": "clay_get_schemaOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "clay_get_columns",
+      "description": "\nList every configured column in a Clay table without returning huge prompts.\n\nThis is the safest inventory tool for large tables: it returns the\ncomplete table-level column list (including columns hidden in views by\ndefault) with order, IDs, names, types, and lightweight config signals.\nUse clay_get_column for one column's complete formula/action settings.\n\nArgs:\n    table_id: A table ID (t_abc123), table URL, or other value accepted\n        by clay_get_schema. Must resolve to one table.\n    include_hidden: When True (default), returns all configured table\n        fields. When False, filters by the first view's visible/hidden\n        field metadata if Clay exposes it.\n    compact: When True, returns only order, id, name, type, and\n        view-visibility metadata. When False, also includes formula text\n        and action/source summary fields, but not full action prompts.\n\nReturns:\n    JSON with table metadata, view IDs/names, and the complete column inventory.\n",
+      "inputSchema": {
+        "properties": {
+          "table_id": {
+            "title": "Table Id",
+            "type": "string"
+          },
+          "include_hidden": {
+            "default": true,
+            "title": "Include Hidden",
+            "type": "boolean"
+          },
+          "compact": {
+            "default": false,
+            "title": "Compact",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "table_id"
+        ],
+        "title": "clay_get_columnsArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "clay_get_columnsOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "clay_get_column",
+      "description": "\nFetch one Clay column's complete configuration by name or field ID.\n\nUse this when a table is too large for clay_get_schema, or when you need\nthe full untruncated formula/action configuration for a selected column:\nformulaText, formula waterfalls, action prompts, input bindings,\nconditional runs, and answer schemas.\n\nArgs:\n    table_id: A table ID (t_abc123), table URL, or other value accepted\n        by clay_get_schema. Must resolve to one table.\n    column: Exact column name (case-insensitive fallback) or field ID.\n\nReturns:\n    JSON with table metadata and the selected column's full configuration.\n",
+      "inputSchema": {
+        "properties": {
+          "table_id": {
+            "title": "Table Id",
+            "type": "string"
+          },
+          "column": {
+            "title": "Column",
+            "type": "string"
+          }
+        },
+        "required": [
+          "table_id",
+          "column"
+        ],
+        "title": "clay_get_columnArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "clay_get_columnOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "clay_get_view",
+      "description": "\nFetch one Clay view with filters/sorts resolved to column names.\n\nUse this to inspect QA/filtering logic without opening the Clay UI.\nThe response preserves Clay's original filter/sort structures and adds\nhuman-readable fieldName/columnName values next to field IDs whenever\nthe referenced column exists in the table schema.\n\nArgs:\n    table_id: A table ID (t_abc123), table URL, or other value accepted\n        by clay_get_schema. Must resolve to one table.\n    view_id: View ID (gv_...) or exact view name.\n\nReturns:\n    JSON with resolved filters, sorts, hidden/visible columns, and view metadata.\n",
+      "inputSchema": {
+        "properties": {
+          "table_id": {
+            "title": "Table Id",
+            "type": "string"
+          },
+          "view_id": {
+            "title": "View Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "table_id",
+          "view_id"
+        ],
+        "title": "clay_get_viewArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "clay_get_viewOutput",
         "type": "object"
       }
     },
@@ -1253,6 +1363,9 @@
         "clay_document_table",
         "clay_export_data",
         "clay_get_schema",
+        "clay_get_columns",
+        "clay_get_column",
+        "clay_get_view",
         "clay_list_tables",
         "clay_run_enrichments",
         "clay_update_column",
