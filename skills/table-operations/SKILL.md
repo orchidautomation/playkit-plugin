@@ -33,6 +33,74 @@ Inputs:
 - `table_id` (string, required)
 - `rows_json` (string, required)
 
+### `clay_add_column`
+
+
+Create a new column on an existing Clay table.
+
+Supports basic typed columns, formula columns, native Clay waterfall
+formula columns, and action/enrichment columns. Formula-bearing inputs
+can use human-readable `{{Column Name}}` references; PlayKit resolves
+them to Clay field IDs before sending the Clay API payload.
+
+Use this when the user needs to add a missing QA check, formula, AI,
+Instantly/action, or other net-new column to a table that already
+exists. Use `dry_run=true` first for complex formula/action columns so
+the payload can be reviewed before mutating Clay.
+
+Args:
+    table_id: A table ID (t_abc123), workbook/table URL, or other
+        value accepted by clay_get_schema. Must resolve to one table.
+    name: New column name.
+    type: One of: text, number, date, url, checkbox, formula, action.
+    data_type: Optional Clay data type override, for example "email"
+        for formula outputs.
+    insert_after: Optional field ID or exact column name to place the
+        new column after.
+    formula_text: Formula text for normal formula columns.
+    formula_type: Formula mode, typically "text" or "waterfall".
+    formula_waterfall: Native Clay waterfall step objects.
+    waterfall_type: Clay waterfall category, for example
+        "person/workEmail".
+    truncate_value: Native Clay waterfall truncate flag.
+    action_key: Action/enrichment slug such as "use-ai".
+    action_version: Action version. Defaults to 1.
+    action_package_id: Package UUID for action columns. If omitted,
+        PlayKit will try to infer it from the bundled action catalog.
+    auth_account_id: Optional connected-account ID for BYOA actions.
+    inputs_binding: Clay action inputsBinding array.
+    conditional_run_formula_text: Optional action conditional-run formula.
+    run_as_button: When set on action columns, preserve Clay's
+        runAsButton behavior in the created field config.
+    resolve_references: When true, resolve known `{{Column Name}}`
+        references in formulas and bindings.
+    dry_run: When true, validate and preview the Clay payload without
+        mutating the table.
+
+Returns:
+    JSON summary of the new column or a dry-run payload preview.
+
+Inputs:
+- `table_id` (string, required)
+- `name` (string, required)
+- `type` (string, required)
+- `data_type` (string | null)
+- `insert_after` (string | null)
+- `formula_text` (string | null)
+- `formula_type` (string | null)
+- `formula_waterfall` (array | null)
+- `waterfall_type` (string | null)
+- `truncate_value` (boolean | null)
+- `action_key` (string | null)
+- `action_version` (integer)
+- `action_package_id` (string | null)
+- `auth_account_id` (string | null)
+- `inputs_binding` (array | null)
+- `conditional_run_formula_text` (string | null)
+- `run_as_button` (boolean | null)
+- `resolve_references` (boolean)
+- `dry_run` (boolean)
+
 ### `clay_audit_table`
 
 
@@ -516,7 +584,9 @@ Inputs:
 
 ### Patching existing tables
 
-- Before `clay_update_column`, inspect the table with `clay_get_schema(table_id)` or, for large tables/specific columns, `clay_get_column(table_id, column)`, and use the exact column name or field ID. Prefer small `updates_json` patches over rebuilding a table when the user asks to change a prompt, formula, input binding, conditional run, description, or native waterfall config.
+- Before changing table structure, inspect with `clay_get_schema(table_id)` or, for large tables/specific columns, `clay_get_columns(table_id)` plus `clay_get_column(table_id, column)`.
+- Use `clay_add_column` when the requested column does not exist yet. Prefer `dry_run=true` first for action columns, AI columns, Instantly columns, native waterfall formula columns, or any column that depends on multiple existing fields.
+- Before `clay_update_column`, inspect the target column and use the exact column name or field ID. Prefer small `updates_json` patches over rebuilding a table when the user asks to change a prompt, formula, input binding, conditional run, description, or native waterfall config.
 - `clay_update_column` resolves `{{Column Name}}` references in `formulaText`, `formula`, `formulaWaterfall[].formula`, and `conditionalRunFormulaText` by default. Keep `resolve_references=true` unless the user intentionally provides Clay field IDs.
 - Before `clay_update_source`, inspect with `clay_get_schema(table_id, include_sources=true)`. Patch the returned nested source shape and leave `merge_existing=true` for partial filter/config edits so existing source settings are not dropped.
 

@@ -478,6 +478,299 @@
       }
     },
     {
+      "name": "clay_add_column",
+      "description": "\nCreate a new column on an existing Clay table.\n\nSupports basic typed columns, formula columns, and action/enrichment\ncolumns. Formula-bearing inputs can use human-readable\n{{Column Name}} references; PlayKit resolves them to Clay field IDs\nbefore sending the Clay API payload.\n\nArgs:\n    table_id: A table ID (t_abc123), workbook/table URL, or other\n        value accepted by clay_get_schema. Must resolve to one table.\n    name: New column name.\n    type: One of: text, number, date, url, checkbox, formula, action.\n    data_type: Optional Clay data type override, for example \"email\"\n        for formula outputs.\n    insert_after: Optional field ID or exact column name to place the\n        new column after.\n    formula_text: Formula text for normal formula columns.\n    formula_type: Formula mode, typically \"text\" or \"waterfall\".\n    formula_waterfall: Native Clay waterfall step objects.\n    waterfall_type: Clay waterfall category, for example\n        \"person/workEmail\".\n    truncate_value: Native Clay waterfall truncate flag.\n    action_key: Action/enrichment slug such as \"use-ai\".\n    action_version: Action version. Defaults to 1.\n    action_package_id: Package UUID for action columns. If omitted,\n        PlayKit will try to infer it from the bundled action catalog.\n    auth_account_id: Optional connected-account ID for BYOA actions.\n    inputs_binding: Clay action inputsBinding array.\n    conditional_run_formula_text: Optional action conditional-run formula.\n    run_as_button: When set on action columns, preserve Clay's\n        runAsButton behavior in the created field config.\n    resolve_references: When true, resolve known {{Column Name}}\n        references in formulas and bindings.\n    dry_run: When true, validate and preview the Clay payload without\n        mutating the table.\n\nReturns:\n    JSON summary of the new column or a dry-run payload preview.\n",
+      "inputSchema": {
+        "properties": {
+          "table_id": {
+            "title": "Table Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string",
+            "enum": [
+              "action",
+              "checkbox",
+              "date",
+              "formula",
+              "number",
+              "text",
+              "url",
+              "boolean"
+            ]
+          },
+          "data_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Data Type"
+          },
+          "insert_after": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Insert After"
+          },
+          "formula_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Formula Text"
+          },
+          "formula_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Formula Type"
+          },
+          "formula_waterfall": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Formula Waterfall"
+          },
+          "waterfall_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Waterfall Type"
+          },
+          "truncate_value": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Truncate Value"
+          },
+          "action_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Action Key"
+          },
+          "action_version": {
+            "default": 1,
+            "title": "Action Version",
+            "type": "integer"
+          },
+          "action_package_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Action Package Id"
+          },
+          "auth_account_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Auth Account Id"
+          },
+          "inputs_binding": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Inputs Binding"
+          },
+          "conditional_run_formula_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Conditional Run Formula Text"
+          },
+          "run_as_button": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Run As Button"
+          },
+          "resolve_references": {
+            "default": true,
+            "title": "Resolve References",
+            "type": "boolean"
+          },
+          "dry_run": {
+            "default": false,
+            "title": "Dry Run",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "table_id",
+          "name",
+          "type"
+        ],
+        "title": "clay_add_columnArguments",
+        "type": "object",
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "formula"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "anyOf": [
+                {
+                  "properties": {
+                    "formula_text": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "formula_text"
+                  ]
+                },
+                {
+                  "properties": {
+                    "formula_waterfall": {
+                      "type": "array",
+                      "minItems": 1,
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "required": [
+                    "formula_waterfall"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "action"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "properties": {
+                "action_key": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "action_key"
+              ]
+            }
+          }
+        ]
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "clay_add_columnOutput",
+        "type": "object"
+      }
+    },
+    {
       "name": "clay_update_column",
       "description": "\nUpdate an existing Clay column's configuration.\n\nUse this to edit formulas, action input bindings, conditional runs,\nnames, descriptions, and other field settings without rebuilding the\ntable. Formula-bearing update values can use human-readable\n{{Column Name}} references; PlayKit resolves them to Clay field IDs.\n\nArgs:\n    table_id: A table ID (t_abc123), workbook/table URL, or other\n        value accepted by clay_get_schema. Must resolve to one table.\n    column: Column field ID (f_abc123) or exact column name.\n    updates_json: JSON object with top-level field updates. You can\n        provide either {\"typeSettings\": {...}} or ergonomic top-level\n        type settings like {\"inputsBinding\": [...],\n        \"conditionalRunFormulaText\": \"...\"}.\n    resolve_references: When true, replace known {{Column Name}}\n        references in formulaText, formula,\n        formulaWaterfall[].formula, and conditionalRunFormulaText\n        values with {{field_id}} refs.\n\nReturns:\n    JSON summary of the updated column and any Clay settings errors.\n",
       "inputSchema": {
@@ -1357,6 +1650,7 @@
       "description": "Build, inspect, patch, run, document, and export tables, rows, columns, sources, and enrichment workflows.",
       "toolNames": [
         "clay_add_rows",
+        "clay_add_column",
         "clay_audit_table",
         "clay_build_table",
         "clay_build_webhook_table",

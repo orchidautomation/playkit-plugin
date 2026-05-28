@@ -13,7 +13,7 @@
 - Server name: `clay-knowledge`
 - Transport: http
 - Auth: header via X-API-Key from PLAYKIT_API_KEY
-- Tool count: 29
+- Tool count: 30
 - Resource count: 0
 - Prompt template count: 0
 
@@ -34,7 +34,7 @@
 ### `table-operations`
 
 - Title: Table Operations
-- Tools: clay_add_rows, clay_audit_table, clay_build_table, clay_build_webhook_table, clay_document_table, clay_export_data, clay_get_schema, clay_get_columns, clay_get_column, clay_get_view, clay_list_tables, clay_run_enrichments, clay_update_column, clay_update_source
+- Tools: clay_add_rows, clay_add_column, clay_audit_table, clay_build_table, clay_build_webhook_table, clay_document_table, clay_export_data, clay_get_schema, clay_get_columns, clay_get_column, clay_get_view, clay_list_tables, clay_run_enrichments, clay_update_column, clay_update_source
 - Description: Build, inspect, patch, run, document, and export tables, rows, columns, sources, and enrichment workflows.
 
 ### `provider-research`
@@ -95,4 +95,3 @@
 - Use discovered MCP resources and prompt templates when they clarify the real product surface.
 - Respect the per-skill resource and prompt-template associations in the metadata/context unless stronger discovery evidence shows they are wrong.
 - Keep INSTRUCTIONS.md as concise routing guidance; do not dump raw vendor documentation into generated sections.
-
