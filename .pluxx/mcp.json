@@ -492,7 +492,17 @@
           },
           "type": {
             "title": "Type",
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "action",
+              "checkbox",
+              "date",
+              "formula",
+              "number",
+              "text",
+              "url",
+              "boolean"
+            ]
           },
           "data_type": {
             "anyOf": [
@@ -678,7 +688,52 @@
           "type"
         ],
         "title": "clay_add_columnArguments",
-        "type": "object"
+        "type": "object",
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "formula"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "anyOf": [
+                {
+                  "required": [
+                    "formula_text"
+                  ]
+                },
+                {
+                  "required": [
+                    "formula_waterfall"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "action"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "required": [
+                "action_key"
+              ]
+            }
+          }
+        ]
       },
       "outputSchema": {
         "properties": {
