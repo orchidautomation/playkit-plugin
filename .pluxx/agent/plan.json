@@ -12,7 +12,7 @@
   },
   "mcp": {
     "metadataPath": ".pluxx/mcp.json",
-    "toolCount": 29,
+    "toolCount": 30,
     "serverName": "clay-knowledge",
     "transport": "http",
     "auth": "header via X-API-Key from PLAYKIT_API_KEY"

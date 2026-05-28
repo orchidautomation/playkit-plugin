@@ -6,13 +6,13 @@ PlayKit helps your AI editor design Clay workflows, build tables, patch existing
 
 ## What's inside
 
-**6 skills · 6 slash commands · 29 MCP tools**
+**6 skills · 6 slash commands · 30 MCP tools**
 
 | Command | What it does |
 |---|---|
 | `/clay-doc <clay-url>` | **Document a Clay workflow.** Generates a client-ready `docs/clay/…` folder (overview, build, prompts, copy, sources, destinations, audit, cost, rebuild, reference + per-table summaries). Concern-first, regen-safe. |
 | `/workflow-design` | Brainstorm plays, design workflows, generate ICPs, write outreach, craft Claygent prompts. |
-| `/table-operations` | Build tables, add rows, patch columns/source filters, run enrichments, audit, export, inspect schemas. |
+| `/table-operations` | Build tables, add rows, create or patch columns/source filters, run enrichments, audit, export, inspect schemas. |
 | `/provider-research` | Compare providers, find integrations, ask any Clay question. |
 | `/account-and-usage` | Check pricing, credits, tool costs, usage. |
 | `/setup-and-auth` | Connect your Clay session cookie + confirm connection. |
@@ -227,7 +227,7 @@ The headline skill. Hand it any Clay URL and it orchestrates `clay_list_tables` 
 
 `clay_get_schema` includes top-level AI `prompts`, up to 5 `sample_rows`, source/search config, source columns, and normalized view details by default. Large schemas may auto-compact non-essential `typeSettings`; with `compact=true` and `include_prompts=false`, prompt bindings are omitted to avoid oversized responses. Use `clay_get_columns` for complete ordered column inventory and `clay_get_column` for one selected column's full formula/action/prompt config.
 
-`clay_update_column` and `clay_update_source` let the plugin patch existing Clay tables without a rebuild: prompts, formulas, action input bindings, conditional runs, native waterfall formula steps, and Find People/Find Companies source filters.
+`clay_add_column`, `clay_update_column`, and `clay_update_source` let the plugin modify existing Clay tables without a rebuild: new typed/formula/action columns, prompts, formulas, action input bindings, conditional runs, native waterfall formula steps, and Find People/Find Companies source filters.
 
 ```
 docs/clay/<workspace>/<scope>/
@@ -312,6 +312,6 @@ pluxx dev --target claude-code
 ## Built with
 
 - [Pluxx](https://github.com/orchidautomation/pluxx) — cross-platform plugin SDK (autopilot, build, install)
-- [PlayKit MCP](https://mcp.playkit.sh/mcp) — 29-tool knowledge + Clay API surface
+- [PlayKit MCP](https://mcp.playkit.sh/mcp) — 30-tool knowledge + Clay API surface
 - Author: **Orchid Labs**
 - License: MIT

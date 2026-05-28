@@ -13,6 +13,7 @@ Arguments: $ARGUMENTS
 
 Primary tools:
 - `clay_add_rows`
+- `clay_add_column`
 - `clay_audit_table`
 - `clay_build_table`
 - `clay_build_webhook_table`
@@ -38,5 +39,5 @@ Workflow:
 ## Custom Notes
 
 <!-- pluxx:custom:start -->
-When inspecting a table, start with `clay_get_schema(table_id)`. It includes top-level `prompts`, up to 5 `sample_rows`, source/search config, source columns, and normalized view details by default. For large tables, use `clay_get_columns` for the complete ordered inventory; use `clay_get_column` when you need the full formula/action/prompt config for one selected column; use `clay_get_view` for filter/sort QA. Use `clay_update_column` for prompt/formula/action binding/conditional-run edits and `clay_update_source` for Find People/Find Companies source filter changes; call `clay_export_data` only when the user needs additional rows.
+When inspecting a table, start with `clay_get_schema(table_id)`. It includes top-level `prompts`, up to 5 `sample_rows`, source/search config, source columns, and normalized view details by default. For large tables, use `clay_get_columns` for the complete ordered inventory; use `clay_get_column` when you need the full formula/action/prompt config for one selected column; use `clay_get_view` for filter/sort QA. Use `clay_add_column` for net-new formula/action/basic columns on existing tables, `clay_update_column` for prompt/formula/action binding/conditional-run edits, and `clay_update_source` for Find People/Find Companies source filter changes; call `clay_export_data` only when the user needs additional rows.
 <!-- pluxx:custom:end -->

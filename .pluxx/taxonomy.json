@@ -27,6 +27,7 @@
     "description": "Build, inspect, patch, run, document, and export tables, rows, columns, sources, and enrichment workflows.",
     "toolNames": [
       "clay_add_rows",
+      "clay_add_column",
       "clay_audit_table",
       "clay_build_table",
       "clay_build_webhook_table",
