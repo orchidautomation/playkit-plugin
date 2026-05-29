@@ -32,8 +32,20 @@ jobs:
         with:
           node-version: 20
 
+      - name: Check out Pluxx
+        uses: actions/checkout@v4
+        with:
+          repository: orchidautomation/pluxx
+          ref: 213774b49cb641042227b235f1de37a8fa1a77d8
+          path: .pluxx-release
+
       - name: Install Pluxx
-        run: npm install -g github:orchidautomation/pluxx#213774b49cb641042227b235f1de37a8fa1a77d8
+        working-directory: .pluxx-release
+        run: |
+          npm ci
+          npm run build
+          npm pack --pack-destination "$RUNNER_TEMP"
+          npm install -g "$RUNNER_TEMP"/orchid-labs-pluxx-*.tgz
 
       - name: Validate plugin
         run: pluxx test
