@@ -18,7 +18,7 @@ PlayKit connects to its MCP over HTTP. Export `PLAYKIT_API_KEY` so Pluxx can sen
 - `get_pricing`: Get PlayKit pricing tiers, per-tool costs, and checkout URLs.
 - `get_tool_costs`: Get per-tool credit costs for all PlayKit MCP tools.
 - `get_usage`: Get your current PlayKit usage, remaining credits, and tier info.
-- `clay_connect`: Connect to Clay by providing your session cookie.
+- `clay_connect`: Check whether Clay access is already configured and return secure provisioning guidance. Do not ask the user to paste a Clay session cookie into chat.
 - `clay_status`: Check Clay API connection status.
 - `clay_list_tables`: Browse Clay tables in a workspace or workbook.
 - `clay_get_schema`: Get table schema, prompts, sample rows, source/search config, source columns, and view details. In compact mode with `include_prompts=false`, prompt bindings are omitted to avoid oversized responses.

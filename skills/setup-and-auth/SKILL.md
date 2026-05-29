@@ -13,26 +13,16 @@ Confirm access, auth state, and session readiness before running operational wor
 ### `clay_connect`
 
 
-Connect to Clay by providing your session cookie.
+Check whether Clay access is already configured and return secure provisioning guidance.
 
-Each user must call this once per session to enable Clay API tools.
-The cookie is stored in memory for your account only.
-
-How to get your cookie:
-1. Open Clay in Chrome
-2. DevTools (Cmd+Shift+I) > Network tab
-3. Click any request to api.clay.com
-4. Copy the full Cookie header value
-
-Args:
-    session_cookie: The full cookie string from your Clay browser session.
+This tool no longer accepts raw Clay session cookies through MCP inputs. Do not ask the user to paste a Clay cookie into chat or a tool argument.
 
 Returns:
-    Connection status with workspace info if successful.
+    Connection guidance and the current connection state.
 
 
 Inputs:
-- `session_cookie` (string, required)
+- None
 
 ### `clay_status`
 
@@ -40,7 +30,7 @@ Inputs:
 Check Clay API connection status.
 
 Shows whether you're connected, which workspaces you have access to,
-and how the session cookie was provided (clay_connect vs env var).
+and whether Clay access is configured server-side.
 
 Returns:
     Connection status with workspace details.
@@ -48,7 +38,7 @@ Returns:
 
 ## Example Requests
 
-- "Find clay connects with <session_cookie>."
+- "Check whether Clay is connected."
 - "Find clay status."
 
 ## Usage

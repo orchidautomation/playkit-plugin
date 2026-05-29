@@ -15,7 +15,7 @@ PlayKit helps your AI editor design Clay workflows, build tables, patch existing
 | `/table-operations` | Build tables, add rows, create or patch columns/source filters, run enrichments, audit, export, inspect schemas. |
 | `/provider-research` | Compare providers, find integrations, ask any Clay question. |
 | `/account-and-usage` | Check pricing, credits, tool costs, usage. |
-| `/setup-and-auth` | Connect your Clay session cookie + confirm connection. |
+| `/setup-and-auth` | Confirm PlayKit auth and Clay connection state. |
 
 > Codex: slash commands degrade on Codex (per the Pluxx core-four mapping). Skills ship fully and you invoke them by name; other three runners get `/commands` with argument expansion.
 
@@ -265,7 +265,7 @@ docs/clay/<workspace>/<scope>/
 
 **"`PLAYKIT_API_KEY` is not set"** — the `sessionStart` hook ran and didn't find the env var. Re-check step 1 of Install, or see Persisting your API key.
 
-**"Clay API not connected" inside `/clay-doc`** — PlayKit also needs your Clay session cookie. Run `clay_connect(session_cookie="…")` once per session; see the [PlayKit docs](https://playkit.sh/docs) for how to grab the cookie.
+**"Clay API not connected" inside `/clay-doc`** — Clay access must be provisioned server-side outside model-visible chat. Run `clay_connect` for the current secure setup guidance; do not paste a Clay session cookie into chat.
 
 **Claude Code doesn't see the plugin** — run `/reload-plugins` in the session.
 

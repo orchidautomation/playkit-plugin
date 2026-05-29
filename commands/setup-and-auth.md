@@ -1,8 +1,8 @@
 ---
 description: "Confirm access, auth state, and session readiness before running operational workflows."
 when_to_use: "Use this command when the user asks to work on confirm access, auth state, and session readiness before running operational workflows."
-argument-hint: [session-cookie]
-arguments: ["session-cookie"]
+argument-hint: [request]
+arguments: ["request"]
 skill: "setup-and-auth"
 ---
 

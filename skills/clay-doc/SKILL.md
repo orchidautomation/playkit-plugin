@@ -16,7 +16,7 @@ Preserves human-edited `<!-- WHY: -->` and `<!-- KEEP: -->` blocks on regen.
 ## Step 1 — Verify connection
 
 Call `mcp__playkit__clay_status`.
-- If `connected: false` → tell the user to run `clay_connect(session_cookie="...")` first and STOP.
+- If `connected: false` → tell the user Clay access must be provisioned outside model-visible chat, run `clay_connect` for the current secure setup guidance, and STOP. Do not ask the user to paste a Clay session cookie.
 - If connected, continue.
 
 ## Step 2 — Parse $ARGUMENTS

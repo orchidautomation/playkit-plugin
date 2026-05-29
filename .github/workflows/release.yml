@@ -33,7 +33,7 @@ jobs:
           node-version: 20
 
       - name: Install Pluxx
-        run: npm install -g @orchid-labs/pluxx
+        run: npm install -g github:orchidautomation/pluxx#213774b49cb641042227b235f1de37a8fa1a77d8
 
       - name: Validate plugin
         run: pluxx test
