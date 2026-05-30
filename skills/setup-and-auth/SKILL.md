@@ -13,12 +13,12 @@ Confirm access, auth state, and session readiness before running operational wor
 ### `clay_connect`
 
 
-Check whether Clay access is already configured and return secure provisioning guidance.
+Check whether Clay access is already configured and, when needed, return a short-lived browser connection URL.
 
-This tool no longer accepts raw Clay session cookies through MCP inputs. Do not ask the user to paste a Clay cookie into chat or a tool argument.
+This tool no longer accepts raw Clay session cookies through MCP inputs. Do not ask the user to paste a Clay cookie into chat or a tool argument. If it returns `connect_url`, tell the user to open that URL in a browser, paste the Clay cookie only into the browser page, then return and run `clay_status`.
 
 Returns:
-    Connection guidance and the current connection state.
+    Connection state and, when disconnected, a browser `connect_url`.
 
 
 Inputs:

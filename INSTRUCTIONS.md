@@ -3,7 +3,7 @@
 
 Clay expertise for your AI editor: design workflows, build tables, audit workbooks, patch live Clay tables, and generate client-ready docs with PlayKit.
 
-PlayKit connects to its MCP over HTTP. Export `PLAYKIT_API_KEY` so Pluxx can send X-API-Key.
+PlayKit connects to its MCP over HTTP. Provide `PLAYKIT_API_KEY` through the host secret flow or an environment reference so Pluxx can send X-API-Key without writing the secret into plugin files.
 
 ## Workflow Guidance
 
@@ -18,7 +18,7 @@ PlayKit connects to its MCP over HTTP. Export `PLAYKIT_API_KEY` so Pluxx can sen
 - `get_pricing`: Get PlayKit pricing tiers, per-tool costs, and checkout URLs.
 - `get_tool_costs`: Get per-tool credit costs for all PlayKit MCP tools.
 - `get_usage`: Get your current PlayKit usage, remaining credits, and tier info.
-- `clay_connect`: Check whether Clay access is already configured and return secure provisioning guidance. Do not ask the user to paste a Clay session cookie into chat.
+- `clay_connect`: Check whether Clay access is already configured and, when needed, return a short-lived browser connection URL. Do not ask the user to paste a Clay session cookie into chat.
 - `clay_status`: Check Clay API connection status.
 - `clay_list_tables`: Browse Clay tables in a workspace or workbook.
 - `clay_get_schema`: Get table schema, prompts, sample rows, source/search config, source columns, and view details. In compact mode with `include_prompts=false`, prompt bindings are omitted to avoid oversized responses.

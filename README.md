@@ -21,18 +21,13 @@ PlayKit helps your AI editor design Clay workflows, build tables, patch existing
 
 ## Install
 
-**Step 1 — Get your API key** from [playkit.sh → Settings → API Keys](https://playkit.sh) and export it:
-
-```bash
-export PLAYKIT_API_KEY="PK_LIVE_…"
-```
+**Step 1 — Get your API key** from [playkit.sh → Settings → API Keys](https://playkit.sh), then add it to your editor's host secret store or set `PLAYKIT_API_KEY` in your shell outside agent-visible chat.
 
 **Step 2 — Pick your installer.** All installers pull the latest release tarball from GitHub and wire it into your editor.
 
 ### Quick install (one-liner, all runners)
 
 ```bash
-export PLAYKIT_API_KEY="PK_LIVE_…"
 curl -fsSL https://github.com/orchidautomation/playkit-plugin/releases/latest/download/install-all.sh | bash
 ```
 
@@ -41,7 +36,6 @@ curl -fsSL https://github.com/orchidautomation/playkit-plugin/releases/latest/do
 **Claude Code**
 
 ```bash
-export PLAYKIT_API_KEY="PK_LIVE_…"
 curl -fsSL https://github.com/orchidautomation/playkit-plugin/releases/latest/download/install-claude-code.sh | bash
 # then in Claude Code: /reload-plugins
 ```
@@ -51,7 +45,6 @@ Installs to: `~/.claude/plugins/data/playkit-releases/plugins/playkit/`
 **Cursor**
 
 ```bash
-export PLAYKIT_API_KEY="PK_LIVE_…"
 curl -fsSL https://github.com/orchidautomation/playkit-plugin/releases/latest/download/install-cursor.sh | bash
 ```
 
@@ -60,7 +53,6 @@ Installs to: `~/.cursor/plugins/local/playkit/`
 **OpenCode**
 
 ```bash
-export PLAYKIT_API_KEY="PK_LIVE_…"
 curl -fsSL https://github.com/orchidautomation/playkit-plugin/releases/latest/download/install-opencode.sh | bash
 ```
 
@@ -69,7 +61,6 @@ Installs to: `~/.config/opencode/plugins/playkit.ts`
 **Codex**
 
 ```bash
-export PLAYKIT_API_KEY="PK_LIVE_…"
 curl -fsSL https://github.com/orchidautomation/playkit-plugin/releases/latest/download/install-codex.sh | bash
 ```
 
@@ -80,7 +71,6 @@ If you want Codex plugin-bundled hooks, enable `plugin_hooks = true` under `[fea
 ### Install from source (development)
 
 ```bash
-export PLAYKIT_API_KEY="PK_LIVE_…"
 git clone https://github.com/orchidautomation/playkit-plugin.git
 cd playkit-plugin
 npm install -g @orchid-labs/pluxx   # one-time, if you don't have Pluxx
@@ -91,111 +81,19 @@ pluxx install --trust --target claude-code   # or cursor / codex / opencode, or 
 
 ## Persisting your API key
 
-A plain `export PLAYKIT_API_KEY=…` only lives for the current shell. Persist it once and every editor, terminal, and install script on your machine picks it up automatically.
+A plain `export PLAYKIT_API_KEY=...` only lives for the current shell. Prefer your editor's host secret flow, Pluxx's secret prompt, 1Password, or your operating system's environment-variable UI so the key does not appear in chat transcripts, shell history, or copied terminal logs.
 
-### macOS (zsh — default since Catalina)
-
-macOS Catalina and later default to zsh. `~/.zshrc` loads on every interactive shell.
+If you use an environment variable, set `PLAYKIT_API_KEY` manually outside the agent context. Verify presence without printing the value:
 
 ```bash
-# Append the export to your shell profile
-echo 'export PLAYKIT_API_KEY="PK_LIVE_…"' >> ~/.zshrc
-
-# Reload the profile in the current shell
-source ~/.zshrc
-
-# Verify it's set
-echo $PLAYKIT_API_KEY
+test -n "$PLAYKIT_API_KEY" && echo "PLAYKIT_API_KEY is set"
 ```
 
-Not sure which shell you're on? Run `echo $SHELL`. If it says `/bin/zsh`, use `~/.zshrc`. If `/bin/bash`, use `~/.bash_profile` (macOS) or `~/.bashrc` (Linux).
-
-> **GUI apps on macOS don't read `~/.zshrc`.** If you launch Cursor, VS Code, or Claude Desktop from Finder/Spotlight, the env var won't be visible. Two fixes:
-> - **Launch the editor from the terminal** (`cursor .`, `code .`) — it inherits the shell env.
-> - **Or set it machine-wide** with `launchctl` so GUI apps see it too:
->   ```bash
->   launchctl setenv PLAYKIT_API_KEY "PK_LIVE_…"
->   ```
->   Add that line to `~/.zshrc` so it re-runs every login. `launchctl setenv` persists until the next reboot unless you wire up a `LaunchAgent` plist — for most people, reloading on shell startup is enough.
-
-### Linux (bash/zsh)
-
-```bash
-# bash (default on most distros)
-echo 'export PLAYKIT_API_KEY="PK_LIVE_…"' >> ~/.bashrc
-source ~/.bashrc
-
-# zsh
-echo 'export PLAYKIT_API_KEY="PK_LIVE_…"' >> ~/.zshrc
-source ~/.zshrc
-```
-
-For system-wide (all users), root can write to `/etc/environment`:
-
-```bash
-echo 'PLAYKIT_API_KEY=PK_LIVE_…' | sudo tee -a /etc/environment
-```
-
-Log out and back in for `/etc/environment` to take effect.
-
-### Windows — PowerShell (recommended)
-
-The cleanest way. This sets a user-level env var that persists across reboots and is visible to every app (Cursor, VS Code, Claude Desktop, WSL, etc.).
+On Windows PowerShell:
 
 ```powershell
-# Set it permanently for your user
-[System.Environment]::SetEnvironmentVariable('PLAYKIT_API_KEY', 'PK_LIVE_…', 'User')
-
-# Make it available in the current session too
-$env:PLAYKIT_API_KEY = 'PK_LIVE_…'
-
-# Verify
-echo $env:PLAYKIT_API_KEY
+if ($env:PLAYKIT_API_KEY) { "PLAYKIT_API_KEY is set" }
 ```
-
-Close and reopen your terminal (and any running editors) to pick up the new value.
-
-To persist it across every future PowerShell session without re-setting, add this to your PowerShell profile:
-
-```powershell
-# Open your profile (creates it if it doesn't exist)
-if (!(Test-Path -Path $PROFILE)) { New-Item -ItemType File -Path $PROFILE -Force }
-notepad $PROFILE
-
-# Add this line and save:
-$env:PLAYKIT_API_KEY = [System.Environment]::GetEnvironmentVariable('PLAYKIT_API_KEY', 'User')
-```
-
-### Windows — Command Prompt (`setx`)
-
-```cmd
-setx PLAYKIT_API_KEY "PK_LIVE_…"
-```
-
-`setx` writes to the user registry. The value is available in **new** terminals only — close and reopen CMD to see it. Verify with `echo %PLAYKIT_API_KEY%`.
-
-### Windows — GUI (for non-terminal users)
-
-1. Start → search "Environment Variables" → "Edit environment variables for your account"
-2. Under **User variables**, click **New**
-3. Variable name: `PLAYKIT_API_KEY`
-4. Variable value: your `PK_LIVE_…` key
-5. OK → OK → restart Cursor / VS Code / Claude Desktop
-
-### Windows — WSL (Ubuntu etc.)
-
-WSL is Linux, so use the Linux bash instructions above inside the WSL shell. WSL does **not** inherit Windows env vars by default — set it separately in `~/.bashrc` inside WSL.
-
-### Project-local override (`.env.local`)
-
-For local plugin development or one-off testing, put the key in a repo-local `.env` file instead of global env:
-
-```bash
-cd playkit-plugin
-echo 'PLAYKIT_API_KEY=PK_LIVE_…' > .env.local
-```
-
-`.env*` is already gitignored. Pluxx and most AI tooling will pick it up automatically.
 
 ### 1Password CLI (avoid plaintext on disk)
 
@@ -265,7 +163,7 @@ docs/clay/<workspace>/<scope>/
 
 **"`PLAYKIT_API_KEY` is not set"** — the `sessionStart` hook ran and didn't find the env var. Re-check step 1 of Install, or see Persisting your API key.
 
-**"Clay API not connected" inside `/clay-doc`** — Clay access must be provisioned server-side outside model-visible chat. Run `clay_connect` for the current secure setup guidance; do not paste a Clay session cookie into chat.
+**"Clay API not connected" inside `/clay-doc`** — Run `clay_connect`, open the returned browser URL, paste the Clay cookie only into that browser page, then return and run `clay_status`. Do not paste a Clay session cookie into chat.
 
 **Claude Code doesn't see the plugin** — run `/reload-plugins` in the session.
 
