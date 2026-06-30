@@ -13,7 +13,7 @@
 - Server name: `clay-knowledge`
 - Transport: http
 - Auth: header via X-API-Key from PLAYKIT_API_KEY
-- Tool count: 30
+- Tool count: 31
 - Resource count: 0
 - Prompt template count: 0
 
@@ -40,8 +40,8 @@
 ### `provider-research`
 
 - Title: Provider Research
-- Tools: ask_clay, compare_providers, find_integrations
-- Description: Compare providers, integrations, and capability tradeoffs before choosing a workflow.
+- Tools: ask_clay, clay_find_actions, compare_providers, find_integrations
+- Description: Compare providers, integrations, action metadata, and capability tradeoffs before choosing a workflow.
 
 ### `account-and-usage`
 
@@ -54,7 +54,7 @@
 - `commands/setup-and-auth.md`: Confirm access, auth state, and session readiness before running operational workflows.
 - `commands/workflow-design.md`: Define strategy, prompts, targeting, and workflow shape before building tables or running enrichments.
 - `commands/table-operations.md`: Build, inspect, patch, run, document, and export tables, rows, columns, sources, and enrichment workflows.
-- `commands/provider-research.md`: Compare providers, integrations, and capability tradeoffs before choosing a workflow.
+- `commands/provider-research.md`: Compare providers, integrations, action metadata, and capability tradeoffs before choosing a workflow.
 - `commands/account-and-usage.md`: Check pricing, usage, limits, credits, and upgrade context for the current account.
 
 ## Lint Snapshot
@@ -71,7 +71,7 @@
 - [warning] codex-command-translation: Command fields "when_to_use", "argument-hint", "arguments", "skill", "skills" are not native Codex plugin slash-command fields today. Codex does not currently document plugin-packaged slash-command parity. Pluxx keeps canonical command intent through AGENTS.md routing guidance and `.codex/commands.generated.json`.
 - [warning] codex-command-translation: Command fields "when_to_use", "argument-hint", "arguments", "skill", "skills" are not native Codex plugin slash-command fields today. Codex does not currently document plugin-packaged slash-command parity. Pluxx keeps canonical command intent through AGENTS.md routing guidance and `.codex/commands.generated.json`.
 - [warning] codex-commands-routing-guidance: Codex does not currently document plugin-packaged slash-command parity. Pluxx keeps canonical command intent through AGENTS.md routing guidance and `.codex/commands.generated.json`. Pluxx will degrade commands into skills plus those routing surfaces today.
-- [warning] codex-hooks-external-config: Pluxx now bundles Codex hooks at `hooks/hooks.json`, and Codex plugin-bundled hook loading requires `plugin_hooks = true` under `[features]`. The general `hooks` flag covers non-plugin hook config and defaults on; `codex_hooks` is deprecated and should not be treated as a plugin-bundled hook fallback. If bundled hooks do not activate, enable `plugin_hooks = true`, reload Codex, and retest in a trusted interactive session.
+- [warning] codex-hooks-external-config: Pluxx now bundles Codex hooks at `hooks/hooks.json`, and current Codex docs use `hooks = true` under `[features]` as the canonical hook feature key. `codex_hooks` is deprecated and should not be treated as the current hook feature key. If bundled hooks do not activate, enable `hooks = true`, reload Codex, and retest in a trusted interactive session.
 - [warning] primitive-degrade-summary: On codex, these active compiler buckets will compile to weaker native equivalents: commands.
 - [warning] primitive-translate-summary: On opencode, these active compiler buckets will be re-expressed through different native surfaces: hooks.
 - [warning] primitive-translate-summary: On codex, these active compiler buckets will be re-expressed through different native surfaces: hooks.

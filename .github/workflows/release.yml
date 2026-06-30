@@ -36,7 +36,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: orchidautomation/pluxx
-          ref: 213774b49cb641042227b235f1de37a8fa1a77d8
+          ref: d0205280f7c5197a2efe454b5e14ccfd2a7544bb
           path: .pluxx-release
 
       - name: Install Pluxx

@@ -6,14 +6,14 @@ PlayKit helps your AI editor design Clay workflows, build tables, patch existing
 
 ## What's inside
 
-**6 skills · 6 slash commands · 30 MCP tools**
+**6 skills · 6 slash commands · 31 MCP tools**
 
 | Command | What it does |
 |---|---|
 | `/clay-doc <clay-url>` | **Document a Clay workflow.** Generates a client-ready `docs/clay/…` folder (overview, build, prompts, copy, sources, destinations, audit, cost, rebuild, reference + per-table summaries). Concern-first, regen-safe. |
 | `/workflow-design` | Brainstorm plays, design workflows, generate ICPs, write outreach, craft Claygent prompts. |
 | `/table-operations` | Build tables, add rows, create or patch columns/source filters, run enrichments, audit, export, inspect schemas. |
-| `/provider-research` | Compare providers, find integrations, ask any Clay question. |
+| `/provider-research` | Compare providers, find integrations, resolve action keys/package IDs, ask any Clay question. |
 | `/account-and-usage` | Check pricing, credits, tool costs, usage. |
 | `/setup-and-auth` | Confirm PlayKit auth and Clay connection state. |
 
@@ -126,6 +126,8 @@ The headline skill. Hand it any Clay URL and it orchestrates `clay_list_tables` 
 `clay_get_schema` includes top-level AI `prompts`, up to 5 `sample_rows`, source/search config, source columns, and normalized view details by default. Large schemas may auto-compact non-essential `typeSettings`; with `compact=true` and `include_prompts=false`, prompt bindings are omitted to avoid oversized responses. Use `clay_get_columns` for complete ordered column inventory and `clay_get_column` for one selected column's full formula/action/prompt config.
 
 `clay_add_column`, `clay_update_column`, and `clay_update_source` let the plugin modify existing Clay tables without a rebuild: new typed/formula/action columns, prompts, formulas, action input bindings, conditional runs, native waterfall formula steps, and Find People/Find Companies source filters.
+
+For action columns, `clay_find_actions` gives agents a lookup-first path from human provider language to exact Clay metadata. Example: find the Mixrank "Companies, People, and Jobs" action, review its `actionKey`/`actionPackageId` and input names, run `clay_add_column(..., dry_run=true)`, then apply the mutation only after the preview looks right.
 
 ```
 docs/clay/<workspace>/<scope>/

@@ -46,9 +46,10 @@
   {
     "dirName": "provider-research",
     "title": "Provider Research",
-    "description": "Compare providers, integrations, and capability tradeoffs before choosing a workflow.",
+    "description": "Compare providers, integrations, action metadata, and capability tradeoffs before choosing a workflow.",
     "toolNames": [
       "ask_clay",
+      "clay_find_actions",
       "compare_providers",
       "find_integrations"
     ]
