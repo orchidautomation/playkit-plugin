@@ -13,32 +13,35 @@ Confirm access, auth state, and session readiness before running operational wor
 ### `clay_connect`
 
 
-Check whether Clay access is already configured and, when needed, return a short-lived browser connection URL.
+        Start or inspect the browser-based Clay connection flow.
 
-This tool no longer accepts raw Clay session cookies through MCP inputs. Do not ask the user to paste a Clay cookie into chat or a tool argument. If it returns `connect_url`, tell the user to open that URL in a browser, paste the Clay cookie only into the browser page, then return and run `clay_status`.
+        This tool never accepts raw Clay session cookies through MCP inputs. If
+        Clay is not connected, it returns a short-lived browser URL where the
+        human can submit the cookie directly to PlayKit outside model-visible
+        chat. Local development can still use the CLAY_SESSION_COOKIE
+        environment variable on the server before PlayKit starts.
 
-Returns:
-    Connection state and, when disconnected, a browser `connect_url`.
+        Returns:
+            Current connection state, and a connect_url when browser connection
+            is needed.
 
-
-Inputs:
-- None
 
 ### `clay_status`
 
 
-Check Clay API connection status.
+        Check Clay API connection status.
 
-Shows whether you're connected, which workspaces you have access to,
-and whether Clay access is configured server-side.
+        Shows whether you're connected, which workspaces you have access to,
+        and whether the session was provisioned server-side or via a local-dev
+        environment variable.
 
-Returns:
-    Connection status with workspace details.
+        Returns:
+            Connection status with workspace details.
 
 
 ## Example Requests
 
-- "Check whether Clay is connected."
+- "Find clay connects."
 - "Find clay status."
 
 ## Usage

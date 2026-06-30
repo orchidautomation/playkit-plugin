@@ -6,7 +6,7 @@ const PLAYKIT_SCREENSHOT = "./assets/playkit-plugin-card.svg"
 
 export default definePlugin({
   name: "playkit",
-  version: '0.1.7',
+  version: '0.1.8',
   description: "Clay expertise for your AI editor: design workflows, build and patch tables, audit workbooks, and generate client-ready docs with PlayKit.",
   author: {
     name: "Orchid Labs",
@@ -79,7 +79,7 @@ export default definePlugin({
     defaultPrompts: [
       "Design a Clay workflow for a high-volume outbound campaign.",
       "Patch this Clay source filter or AI prompt without rebuilding the table.",
-      "Generate client-ready documentation for this Clay table."
+      "Find the Clay action key for Mixrank Companies, People, and Jobs, then dry-run an action column."
     ],
     websiteURL: "https://playkit.sh"
   },

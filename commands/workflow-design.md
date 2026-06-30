@@ -1,8 +1,8 @@
 ---
 description: "Define strategy, prompts, targeting, and workflow shape before building tables or running enrichments."
 when_to_use: "Use this command when the user asks to work on define strategy, prompts, targeting, and workflow shape before building tables or running enrichments."
-argument-hint: [use-case] [task]
-arguments: ["use-case","task"]
+argument-hint: [use-case] [industry]
+arguments: ["use-case","industry"]
 skill: "workflow-design"
 ---
 
