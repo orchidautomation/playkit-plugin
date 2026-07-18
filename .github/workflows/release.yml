@@ -13,16 +13,18 @@ on:
         type: string
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  github-release:
-    name: Publish GitHub release assets
+  validate:
+    name: Validate plugin
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     env:
       PLUXX_VERSION: 0.1.36
       PLUXX_INTEGRITY: sha512-23lcYezDYXG0FM5Ys9Nrw7oBvp6pX5StkeWeoDcBm7HZ/V3z3djA9y3p3KVXAGzhkubIEUUaC1kD7evKqBB1DQ==
@@ -30,6 +32,45 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install verified Pluxx
+        run: |
+          actual_integrity="$(npm view "@orchid-labs/pluxx@$PLUXX_VERSION" dist.integrity)"
+          test "$actual_integrity" = "$PLUXX_INTEGRITY"
+          npm install -g "@orchid-labs/pluxx@$PLUXX_VERSION"
+          test "$(pluxx --version)" = "$PLUXX_VERSION"
+
+      - name: Validate plugin
+        env:
+          PLUXX_COMMAND_JSON: '["pluxx"]'
+          OPENCODE_TYPESCRIPT_RUNNER_JSON: '["npx", "--yes", "tsx@4.20.3"]'
+        run: |
+          pluxx test
+          node --test tests/opencode-wrapper.test.mjs
+
+  github-release:
+    name: Publish GitHub release assets
+    if: github.event_name != 'pull_request'
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      PLUXX_VERSION: 0.1.36
+      PLUXX_INTEGRITY: sha512-23lcYezDYXG0FM5Ys9Nrw7oBvp6pX5StkeWeoDcBm7HZ/V3z3djA9y3p3KVXAGzhkubIEUUaC1kD7evKqBB1DQ==
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -52,7 +93,6 @@ jobs:
           node --test tests/opencode-wrapper.test.mjs
 
       - name: Publish GitHub release
-        if: github.event_name != 'pull_request'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
