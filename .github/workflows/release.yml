@@ -1,6 +1,7 @@
 name: Release
 
 on:
+  pull_request:
   push:
     branches:
       - main
@@ -16,12 +17,15 @@ permissions:
 
 concurrency:
   group: release-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   github-release:
     name: Publish GitHub release assets
     runs-on: ubuntu-latest
+    env:
+      PLUXX_VERSION: 0.1.36
+      PLUXX_INTEGRITY: sha512-23lcYezDYXG0FM5Ys9Nrw7oBvp6pX5StkeWeoDcBm7HZ/V3z3djA9y3p3KVXAGzhkubIEUUaC1kD7evKqBB1DQ==
 
     steps:
       - name: Check out repository
@@ -32,25 +36,23 @@ jobs:
         with:
           node-version: 20
 
-      - name: Check out Pluxx
-        uses: actions/checkout@v4
-        with:
-          repository: orchidautomation/pluxx
-          ref: d0205280f7c5197a2efe454b5e14ccfd2a7544bb
-          path: .pluxx-release
-
-      - name: Install Pluxx
-        working-directory: .pluxx-release
+      - name: Install verified Pluxx
         run: |
-          npm ci
-          npm run build
-          npm pack --pack-destination "$RUNNER_TEMP"
-          npm install -g "$RUNNER_TEMP"/orchid-labs-pluxx-*.tgz
+          actual_integrity="$(npm view "@orchid-labs/pluxx@$PLUXX_VERSION" dist.integrity)"
+          test "$actual_integrity" = "$PLUXX_INTEGRITY"
+          npm install -g "@orchid-labs/pluxx@$PLUXX_VERSION"
+          test "$(pluxx --version)" = "$PLUXX_VERSION"
 
       - name: Validate plugin
-        run: pluxx test
+        env:
+          PLUXX_COMMAND_JSON: '["pluxx"]'
+          OPENCODE_TYPESCRIPT_RUNNER_JSON: '["npx", "--yes", "tsx@4.20.3"]'
+        run: |
+          pluxx test
+          node --test tests/opencode-wrapper.test.mjs
 
       - name: Publish GitHub release
+        if: github.event_name != 'pull_request'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
