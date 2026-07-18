@@ -73,7 +73,7 @@ If you want Codex plugin-bundled hooks, enable `plugin_hooks = true` under `[fea
 ```bash
 git clone https://github.com/orchidautomation/playkit-plugin.git
 cd playkit-plugin
-npm install -g @orchid-labs/pluxx   # one-time, if you don't have Pluxx
+npm install -g @orchid-labs/pluxx@0.1.36   # exact release toolchain pin
 pluxx install --trust --target claude-code   # or cursor / codex / opencode, or omit for all
 ```
 
@@ -196,17 +196,20 @@ playkit-plugin/
 # Re-pull MCP tool metadata if PlayKit adds/removes tools
 pluxx sync --from-mcp https://mcp.playkit.sh/mcp
 
-# Validate config
-pluxx doctor
+# Validate config with the release-pinned Pluxx version
+npx --yes @orchid-labs/pluxx@0.1.36 doctor
 
 # Build all targets
-pluxx build
+npx --yes @orchid-labs/pluxx@0.1.36 build
 
 # Lint + test all targets
-pluxx test
+npx --yes @orchid-labs/pluxx@0.1.36 test
+
+# Execute the installed top-level OpenCode wrapper regression
+PLUXX_COMMAND_JSON='["npx","--yes","@orchid-labs/pluxx@0.1.36"]' node --test tests/opencode-wrapper.test.mjs
 
 # Quick rebuild + reinstall during iteration
-pluxx dev --target claude-code
+npx --yes @orchid-labs/pluxx@0.1.36 dev --target claude-code
 ```
 
 ## Built with
